@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Cache directories
+.cache/
+.eslintcache
+.stylelintcache
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Lock files
+package-lock.json
+yarn.lock
+
+# Config files that should not be formatted
+*.config.js
+*.config.mjs
+*.config.ts
+
+# Generated files
+eslint-show-config.json
