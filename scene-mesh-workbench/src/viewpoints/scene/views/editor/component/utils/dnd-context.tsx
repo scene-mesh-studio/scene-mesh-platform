@@ -1,25 +1,39 @@
-import type { AllNodeData } from '../scene-flow-types';
+import type { AllNodeData } from "../scene-flow-types";
 
-import { Dispatch, SetStateAction, PropsWithChildren, useState, useContext, createContext } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  PropsWithChildren,
+  useState,
+  useContext,
+  createContext,
+} from "react";
 
 interface DnDState {
   nodeType: string;
   initParas: AllNodeData;
 }
 
-type FlowDnDContextType = [DnDState | null, Dispatch<SetStateAction<DnDState | null>>];
+type FlowDnDContextType = [
+  DnDState | null,
+  Dispatch<SetStateAction<DnDState | null>>,
+];
 
 const FlowDnDContext = createContext<FlowDnDContextType | undefined>(undefined);
 
 export const FlowDnDProvider = ({ children }: PropsWithChildren<unknown>) => {
   const [type, setType] = useState<DnDState | null>(null);
-  return <FlowDnDContext.Provider value={[type, setType]}>{children}</FlowDnDContext.Provider>;
+  return (
+    <FlowDnDContext.Provider value={[type, setType]}>
+      {children}
+    </FlowDnDContext.Provider>
+  );
 };
 
 export const useFlowDnD = (): FlowDnDContextType => {
   const context = useContext(FlowDnDContext);
   if (!context) {
-    throw new Error('useDnD must be used within a DnDProvider');
+    throw new Error("useDnD must be used within a DnDProvider");
   }
   return context;
 };

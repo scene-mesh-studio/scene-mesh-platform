@@ -1,5 +1,5 @@
-import type { Node, Edge } from '@xyflow/react';
-import { ELK, ElkNode, ElkExtendedEdge } from 'elkjs';
+import type { Node, Edge } from "@xyflow/react";
+import { ELK, ElkNode, ElkExtendedEdge } from "elkjs";
 
 // 定义布局常量
 const DEFAULT_NODE_WIDTH = 200;
@@ -17,13 +17,13 @@ const GROUP_PADDING = 40;
 const buildElkHierarchy = (
   nodesToProcess: Node[],
   allNodes: Node[],
-  direction: 'RIGHT' | 'DOWN'
+  direction: "RIGHT" | "DOWN",
 ): ElkNode[] => {
   const elkNodes: ElkNode[] = [];
   const nodeToElkNodeMap = new Map<string, ElkNode>();
 
   // 首先，为当前层级的所有节点创建 ELK 节点对象
-  nodesToProcess.forEach((node) => {
+  nodesToProcess.forEach(node => {
     const elkNode: ElkNode = {
       id: node.id,
       width: node.width || DEFAULT_NODE_WIDTH,
@@ -33,27 +33,27 @@ const buildElkHierarchy = (
   });
 
   // 然后，构建层级关系
-  nodesToProcess.forEach((node) => {
+  nodesToProcess.forEach(node => {
     const elkNode = nodeToElkNodeMap.get(node.id)!;
-    const isGroup = node.type === 'group';
+    const isGroup = node.type === "group";
 
     if (isGroup) {
-      const childNodes = allNodes.filter((n) => n.parentId === node.id);
+      const childNodes = allNodes.filter(n => n.parentId === node.id);
       // 递归调用，为子节点构建层级
       elkNode.children = buildElkHierarchy(childNodes, allNodes, direction);
 
       // 关键点 2: Group 内部依然使用 'layered' 算法保持流程清晰
       elkNode.layoutOptions = {
-        'elk.algorithm': 'layered',
-        'elk.direction': direction,
-        'elk.padding': `[top=${GROUP_PADDING + 20}, left=${GROUP_PADDING}, bottom=${GROUP_PADDING}, right=${GROUP_PADDING}]`,
-        'elk.spacing.nodeNode': '80', // Group 内部的节点间距
-        'elk.layered.spacing.nodeNodeBetweenLayers': '100',
+        "elk.algorithm": "layered",
+        "elk.direction": direction,
+        "elk.padding": `[top=${GROUP_PADDING + 20}, left=${GROUP_PADDING}, bottom=${GROUP_PADDING}, right=${GROUP_PADDING}]`,
+        "elk.spacing.nodeNode": "80", // Group 内部的节点间距
+        "elk.layered.spacing.nodeNodeBetweenLayers": "100",
       };
     }
 
     // 只有顶层节点（相对于当前处理的集合）才会被加入到 children 数组中
-    if (!node.parentId || !nodesToProcess.some((n) => n.id === node.parentId)) {
+    if (!node.parentId || !nodesToProcess.some(n => n.id === node.parentId)) {
       elkNodes.push(elkNode);
     }
   });
@@ -71,28 +71,28 @@ const buildElkHierarchy = (
 export const getLayoutedElementsWithELK = async (
   nodes: Node[],
   edges: Edge[],
-  direction: 'RIGHT' | 'DOWN' = 'RIGHT'
+  direction: "RIGHT" | "DOWN" = "RIGHT",
 ): Promise<Node[]> => {
   // @ts-expect-error ELK constructor may not have proper types
   const elk = new ELK();
-  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
 
   // 1. 构建一个完整的、包含所有节点和边的层级结构
   const elkNodes = buildElkHierarchy(nodes, nodes, direction);
-  const elkEdges: ElkExtendedEdge[] = edges.map((edge) => ({
+  const elkEdges: ElkExtendedEdge[] = edges.map(edge => ({
     id: edge.id,
     sources: [edge.source],
     targets: [edge.target],
   }));
 
   const graph: ElkNode = {
-    id: 'root',
+    id: "root",
     layoutOptions: {
       // 关键点 1: 顶层使用 'box' 算法进行紧凑打包
-      'elk.algorithm': 'rectpacking',
-      'elk.direction': direction,
-      'elk.aspectRatio': '1.4',
-      'elk.spacing.nodeNode': '120', // Group 之间的间距
+      "elk.algorithm": "rectpacking",
+      "elk.direction": direction,
+      "elk.aspectRatio": "1.4",
+      "elk.spacing.nodeNode": "120", // Group 之间的间距
     },
     children: elkNodes,
     edges: elkEdges, // 将所有的边都放在顶层处理，ELKjs 会自动处理跨层级的边
@@ -120,7 +120,7 @@ export const getLayoutedElementsWithELK = async (
     });
 
     if (elkNode.children) {
-      elkNode.children.forEach((child) => applyLayout(child, newPosition));
+      elkNode.children.forEach(child => applyLayout(child, newPosition));
     }
   };
 

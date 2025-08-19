@@ -10,7 +10,7 @@ import type {
   ICepPatternNode,
   ICepPatternEdge,
   FlinkCEP_Pattern,
-} from '../scene-flow-types';
+} from "../scene-flow-types";
 
 // =================================================================
 // 2. 新增的 'When-Then' 结构类型定义
@@ -27,7 +27,7 @@ export interface WhenThenClause {
 // convertNode 和 collectNodesRecursively 函数保持不变...
 
 const isComputeNodeType = (type: string): boolean =>
-  ['LLM_INFERENCE', 'FORMAT_OUTPUT'].includes(type);
+  ["LLM_INFERENCE", "FORMAT_OUTPUT"].includes(type);
 
 /**
  * 将单个 React Flow 节点转换为 Flink CEP JSON 格式。
@@ -37,39 +37,39 @@ const convertNode = (
   node: SceneFlowNode,
   allPatternNodes: SceneFlowNode[],
   allPatternEdges: SceneFlowEdge[],
-  idToCepNameMap: Map<string, string>
+  idToCepNameMap: Map<string, string>,
 ): ICepPatternNode => {
   const { data, id } = node;
   const patternData = data as PatternNodeData;
 
   const cepNode: ICepPatternNode = {
     name: idToCepNameMap.get(id)!,
-    type: patternData.type as CepNodeType & ('ATOMIC' | 'COMPOSITE'),
+    type: patternData.type as CepNodeType & ("ATOMIC" | "COMPOSITE"),
     quantifier: patternData.quantifier,
     condition: patternData.condition
-      ? { type: 'AVIATOR', expression: patternData.condition }
+      ? { type: "AVIATOR", expression: patternData.condition }
       : null,
     times: patternData.times || null,
     window: patternData.window || null,
     untilCondition: null,
     afterMatchSkipStrategy: {
-      type: 'SKIP_TILL_NEXT',
+      type: "SKIP_TILL_NEXT",
       patternName: null,
     },
     graph: null,
   };
 
-  if (patternData.type === 'COMPOSITE') {
-    const childNodes = allPatternNodes.filter((n) => n.parentId === id);
-    const childNodeIds = new Set(childNodes.map((n) => n.id));
+  if (patternData.type === "COMPOSITE") {
+    const childNodes = allPatternNodes.filter(n => n.parentId === id);
+    const childNodeIds = new Set(childNodes.map(n => n.id));
     const internalEdges = allPatternEdges.filter(
-      (e) => childNodeIds.has(e.source) && childNodeIds.has(e.target)
+      e => childNodeIds.has(e.source) && childNodeIds.has(e.target),
     );
     cepNode.graph = {
-      nodes: childNodes.map((child) =>
-        convertNode(child, allPatternNodes, allPatternEdges, idToCepNameMap)
+      nodes: childNodes.map(child =>
+        convertNode(child, allPatternNodes, allPatternEdges, idToCepNameMap),
       ),
-      edges: internalEdges.map((edge) => ({
+      edges: internalEdges.map(edge => ({
         source: idToCepNameMap.get(edge.source)!,
         target: idToCepNameMap.get(edge.target)!,
         type: edge.data!.consumingStrategy,
@@ -86,11 +86,11 @@ const convertNode = (
 const collectNodesRecursively = (
   nodeId: string,
   allNodes: SceneFlowNode[],
-  collectedIds: Set<string>
+  collectedIds: Set<string>,
 ) => {
   if (collectedIds.has(nodeId)) return;
   collectedIds.add(nodeId);
-  const children = allNodes.filter((n) => n.parentId === nodeId);
+  const children = allNodes.filter(n => n.parentId === nodeId);
   for (const child of children) {
     collectNodesRecursively(child.id, allNodes, collectedIds);
   }
@@ -103,34 +103,41 @@ const collectNodesRecursively = (
 export const generateFlinkCepJson = (
   reactFlowNodes: SceneFlowNode[],
   reactFlowEdges: SceneFlowEdge[],
-  useId: boolean = false
+  useId: boolean = false,
 ): FlinkCEP_Pattern => {
-  const llmNodes = reactFlowNodes.filter((n) => isComputeNodeType(n.data.type));
+  const llmNodes = reactFlowNodes.filter(n => isComputeNodeType(n.data.type));
   if (llmNodes.length === 0) {
     // 如果没有LLM节点，我们假定所有非计算节点构成一个模式
-    const patternNodes = reactFlowNodes.filter((n) => isComputeNodeType(n.data.type) === false);
+    const patternNodes = reactFlowNodes.filter(
+      n => isComputeNodeType(n.data.type) === false,
+    );
     if (patternNodes.length === 0) return { nodes: [], edges: [] };
 
-    const patternNodeIds = new Set(patternNodes.map((n) => n.id));
+    const patternNodeIds = new Set(patternNodes.map(n => n.id));
     const allPatternEdges = reactFlowEdges.filter(
-      (e) => e.type === 'strategy' && patternNodeIds.has(e.source) && patternNodeIds.has(e.target)
+      e =>
+        e.type === "strategy" &&
+        patternNodeIds.has(e.source) &&
+        patternNodeIds.has(e.target),
     );
     const allPatternNodes = patternNodes;
     const idToCepNameMap = new Map<string, string>();
-    allPatternNodes.forEach((n) => {
+    allPatternNodes.forEach(n => {
       const cepName = useId ? n.id : n.data.label || n.data.name;
       idToCepNameMap.set(n.id, cepName);
     });
     const topLevelPatternNodes = allPatternNodes.filter(
-      (n) => !n.parentId || !patternNodeIds.has(n.parentId)
+      n => !n.parentId || !patternNodeIds.has(n.parentId),
     );
-    const finalCepNodes = topLevelPatternNodes.map((n) =>
-      convertNode(n, allPatternNodes, allPatternEdges, idToCepNameMap)
+    const finalCepNodes = topLevelPatternNodes.map(n =>
+      convertNode(n, allPatternNodes, allPatternEdges, idToCepNameMap),
     );
-    const topLevelNodeIds = new Set(topLevelPatternNodes.map((n) => n.id));
+    const topLevelNodeIds = new Set(topLevelPatternNodes.map(n => n.id));
     const finalCepEdges: ICepPatternEdge[] = allPatternEdges
-      .filter((e) => topLevelNodeIds.has(e.source) && topLevelNodeIds.has(e.target))
-      .map((edge) => ({
+      .filter(
+        e => topLevelNodeIds.has(e.source) && topLevelNodeIds.has(e.target),
+      )
+      .map(edge => ({
         source: idToCepNameMap.get(edge.source)!,
         target: idToCepNameMap.get(edge.target)!,
         type: edge.data!.consumingStrategy,
@@ -142,41 +149,47 @@ export const generateFlinkCepJson = (
   // --- 原有逻辑保持不变 ---
   const patternNodeIds = new Set<string>();
   const queue: string[] = [];
-  reactFlowEdges.forEach((edge) => {
-    if (edge.type === 'compute' && llmNodes.some((llm) => llm.id === edge.target)) {
+  reactFlowEdges.forEach(edge => {
+    if (
+      edge.type === "compute" &&
+      llmNodes.some(llm => llm.id === edge.target)
+    ) {
       queue.push(edge.source);
     }
   });
   const initialPatternStarters = [...queue];
-  initialPatternStarters.forEach((startNodeId) => {
+  initialPatternStarters.forEach(startNodeId => {
     let currentNodeId: string | undefined = startNodeId;
     while (currentNodeId && !patternNodeIds.has(currentNodeId)) {
       collectNodesRecursively(currentNodeId, reactFlowNodes, patternNodeIds);
       const incomingEdge = reactFlowEdges.find(
-        (e) => e.target === currentNodeId && e.type === 'strategy'
+        e => e.target === currentNodeId && e.type === "strategy",
       );
       currentNodeId = incomingEdge?.source;
     }
   });
   const allPatternEdges = reactFlowEdges.filter(
-    (e) => e.type === 'strategy' && patternNodeIds.has(e.source) && patternNodeIds.has(e.target)
+    e =>
+      e.type === "strategy" &&
+      patternNodeIds.has(e.source) &&
+      patternNodeIds.has(e.target),
   );
-  const allPatternNodes = reactFlowNodes.filter((n) => patternNodeIds.has(n.id));
+  const allPatternNodes = reactFlowNodes.filter(n => patternNodeIds.has(n.id));
   const idToCepNameMap = new Map<string, string>();
-  allPatternNodes.forEach((n) => {
+  allPatternNodes.forEach(n => {
     const cepName = useId ? n.id : n.data.label || n.data.name;
     idToCepNameMap.set(n.id, cepName);
   });
   const topLevelPatternNodes = allPatternNodes.filter(
-    (n) => !n.parentId || !patternNodeIds.has(n.parentId)
+    n => !n.parentId || !patternNodeIds.has(n.parentId),
   );
-  const finalCepNodes = topLevelPatternNodes.map((n) =>
-    convertNode(n, allPatternNodes, allPatternEdges, idToCepNameMap)
+  const finalCepNodes = topLevelPatternNodes.map(n =>
+    convertNode(n, allPatternNodes, allPatternEdges, idToCepNameMap),
   );
-  const topLevelNodeIds = new Set(topLevelPatternNodes.map((n) => n.id));
+  const topLevelNodeIds = new Set(topLevelPatternNodes.map(n => n.id));
   const finalCepEdges: ICepPatternEdge[] = allPatternEdges
-    .filter((e) => topLevelNodeIds.has(e.source) && topLevelNodeIds.has(e.target))
-    .map((edge) => ({
+    .filter(e => topLevelNodeIds.has(e.source) && topLevelNodeIds.has(e.target))
+    .map(edge => ({
       source: idToCepNameMap.get(edge.source)!,
       target: idToCepNameMap.get(edge.target)!,
       type: edge.data!.consumingStrategy,
@@ -195,11 +208,12 @@ export const generateFlinkCepJson = (
 export const generateWhenThenJson = (
   reactFlowNodes: SceneFlowNode[],
   reactFlowEdges: SceneFlowEdge[],
-  useId: boolean = false
+  useId: boolean = false,
 ): WhenThenClause[] => {
   // 1. 找到图中所有作为 "then" 部分的 LLM 节点
   const llmNodes = reactFlowNodes.filter(
-    (n): n is SceneFlowNode & { data: LlmNodeData } => isComputeNodeType(n.data.type) as boolean
+    (n): n is SceneFlowNode & { data: LlmNodeData } =>
+      isComputeNodeType(n.data.type) as boolean,
   );
 
   if (llmNodes.length === 0) {
@@ -208,25 +222,25 @@ export const generateWhenThenJson = (
   }
 
   // 2. 为每个 LLM 节点生成一个 "when-then" 对象
-  const whenThenClauses = llmNodes.map((llmNode) => {
+  const whenThenClauses = llmNodes.map(llmNode => {
     // 3. 隔离出当前 LLM 节点的上游子图（即它的 "when" 部分）
     const patternNodeIds = new Set<string>();
     const queue: string[] = [];
 
-    reactFlowEdges.forEach((edge) => {
-      if (edge.type === 'compute' && edge.target === llmNode.id) {
+    reactFlowEdges.forEach(edge => {
+      if (edge.type === "compute" && edge.target === llmNode.id) {
         queue.push(edge.source);
       }
     });
 
     const initialPatternStarters = [...queue];
 
-    initialPatternStarters.forEach((startNodeId) => {
+    initialPatternStarters.forEach(startNodeId => {
       let currentNodeId: string | undefined = startNodeId;
       while (currentNodeId && !patternNodeIds.has(currentNodeId)) {
         collectNodesRecursively(currentNodeId, reactFlowNodes, patternNodeIds);
         const incomingEdge = reactFlowEdges.find(
-          (e) => e.target === currentNodeId && e.type === 'strategy'
+          e => e.target === currentNodeId && e.type === "strategy",
         );
         currentNodeId = incomingEdge?.source;
       }
@@ -234,11 +248,15 @@ export const generateWhenThenJson = (
 
     // 4. 构建只包含当前模式和其对应LLM节点的子图，用于生成"when"部分
     const subgraphNodes = reactFlowNodes.filter(
-      (n) => patternNodeIds.has(n.id) || n.id === llmNode.id
+      n => patternNodeIds.has(n.id) || n.id === llmNode.id,
     );
 
     // 5. 调用现有函数来生成 "when" 部分
-    const whenClause = generateFlinkCepJson(subgraphNodes, reactFlowEdges, useId);
+    const whenClause = generateFlinkCepJson(
+      subgraphNodes,
+      reactFlowEdges,
+      useId,
+    );
 
     // 6. "then" 部分就是 LLM 节点的数据
     const thenClause = {

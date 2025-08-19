@@ -1,22 +1,28 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { EntityViewInspector, createEntityEngineProvider, EntityPermissionActionType } from '@scenemesh/entity-engine';
+import { useRouter } from "next/navigation";
+import {
+  EntityViewInspector,
+  createEntityEngineProvider,
+  EntityPermissionActionType,
+} from "@scenemesh/entity-engine";
 
-import { views, models } from '../model-config';
+import { views, models } from "../model-config";
 
 type EntityEngineProviderWrapperProps = {
   children: React.ReactNode;
 };
 
-export function EntityEngineProviderWrapper(props: EntityEngineProviderWrapperProps) {
+export function EntityEngineProviderWrapper(
+  props: EntityEngineProviderWrapperProps,
+) {
   const router = useRouter();
 
   const EntityEngineProvider = createEntityEngineProvider({
     models,
     views,
     suiteAdapters: [],
-    suiteAdapter: { suiteName: 'build-in', suiteVersion: '1.0.0' },
+    suiteAdapter: { suiteName: "build-in", suiteVersion: "1.0.0" },
     router: {
       navigate: (path: string, state?: any) => {
         console.log(`Navigating to ${path} with state:`, state);
@@ -36,12 +42,10 @@ export function EntityEngineProviderWrapper(props: EntityEngineProviderWrapperPr
       },
     ],
     serverInfo: {
-      baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000',
-      endpoint: process.env.NEXT_PUBLIC_API_ENDPOINT || '/api/ee',
+      baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000",
+      endpoint: process.env.NEXT_PUBLIC_API_ENDPOINT || "/api/ee",
     },
   });
 
-  return (
-    <EntityEngineProvider>{props.children}</EntityEngineProvider>
-  );
+  return <EntityEngineProvider>{props.children}</EntityEngineProvider>;
 }

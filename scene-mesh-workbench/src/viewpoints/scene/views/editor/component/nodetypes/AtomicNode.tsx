@@ -1,14 +1,14 @@
-import type { NodeProps } from '@xyflow/react';
+import type { NodeProps } from "@xyflow/react";
 import type {
   TimeUnit,
   SceneFlowNode,
   PatternNodeData,
   QuantifierProperty,
-} from '../scene-flow-types';
+} from "../scene-flow-types";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 // eslint-disable-next-line no-duplicate-imports
-import { Handle, Position, NodeToolbar, useReactFlow } from '@xyflow/react';
+import { Handle, Position, NodeToolbar, useReactFlow } from "@xyflow/react";
 
 // 导入所有需要的 Material-UI 组件
 import {
@@ -32,9 +32,9 @@ import {
   DialogActions,
   FormControlLabel,
   DialogContentText,
-} from '@mui/material';
+} from "@mui/material";
 
-import { Icon } from '@iconify/react';
+import { Icon } from "@iconify/react";
 
 // --- 辅助函数 (更新部分) ---
 
@@ -45,8 +45,8 @@ import { Icon } from '@iconify/react';
  */
 const getQuantifierText = (data: PatternNodeData): string => {
   const props = data.quantifier.properties;
-  const isOptional = props.includes('OPTIONAL');
-  const isRepeating = props.includes('TIMES') || props.includes('LOOPING');
+  const isOptional = props.includes("OPTIONAL");
+  const isRepeating = props.includes("TIMES") || props.includes("LOOPING");
 
   let text: string;
 
@@ -59,17 +59,17 @@ const getQuantifierText = (data: PatternNodeData): string => {
     }
   } else if (isRepeating) {
     // 如果是循环模式但没有指定具体次数 (例如 oneOrMore().greedy())
-    text = '循环发生';
+    text = "循环发生";
   } else {
     // 默认是发生一次
-    text = '发生一次';
+    text = "发生一次";
   }
 
   // 对可选状态进行包装
   if (isOptional) {
     // 如果只是一个单纯的可选事件，显示更简洁的文本
     if (!isRepeating) {
-      return '可选发生';
+      return "可选发生";
     }
     return `可选 (${text})`;
   }
@@ -84,11 +84,11 @@ const getQuantifierText = (data: PatternNodeData): string => {
  */
 const mapUnitToText = (unit: TimeUnit): string => {
   const unitMap: Record<TimeUnit, string> = {
-    SECONDS: '秒',
-    MINUTES: '分钟',
-    HOURS: '小时',
-    DAYS: '天',
-    MILLISECONDS: '毫秒',
+    SECONDS: "秒",
+    MINUTES: "分钟",
+    HOURS: "小时",
+    DAYS: "天",
+    MILLISECONDS: "毫秒",
   };
   return unitMap[unit] || unit;
 };
@@ -99,12 +99,13 @@ const mapUnitToText = (unit: TimeUnit): string => {
  * @returns 一个表示量词的字符串图标
  */
 const getQuantifierIcon = (properties: QuantifierProperty[]): string => {
-  if (properties.includes('OPTIONAL')) return '?';
-  if (properties.includes('LOOPING') || properties.includes('TIMES')) return '+';
-  return '';
+  if (properties.includes("OPTIONAL")) return "?";
+  if (properties.includes("LOOPING") || properties.includes("TIMES"))
+    return "+";
+  return "";
 };
 
-const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
+const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = props => {
   const { data: nodeData, selected, id } = props;
   const { setNodes, setEdges } = useReactFlow();
 
@@ -123,52 +124,64 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
   const handleCloseDeleteDialog = () => setDeleteDialogOpen(false);
   const handleDataChange = <K extends keyof PatternNodeData>(
     field: K,
-    value: PatternNodeData[K]
+    value: PatternNodeData[K],
   ) => {
-    setEditedData((prev) => ({ ...prev, [field]: value }));
+    setEditedData(prev => ({ ...prev, [field]: value }));
   };
   const handleSave = () => {
-    setNodes((nds) => nds.map((node) => (node.id === id ? { ...node, data: editedData } : node)));
+    setNodes(nds =>
+      nds.map(node => (node.id === id ? { ...node, data: editedData } : node)),
+    );
     handleCloseEditDialog();
   };
   const handleConfirmDelete = () => {
-    setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
-    setNodes((nds) => nds.filter((node) => node.id !== id));
+    setEdges(edges =>
+      edges.filter(edge => edge.source !== id && edge.target !== id),
+    );
+    setNodes(nds => nds.filter(node => node.id !== id));
     handleCloseDeleteDialog();
   };
-  const isOptional = editedData.quantifier.properties.includes('OPTIONAL');
+  const isOptional = editedData.quantifier.properties.includes("OPTIONAL");
   const isLooping =
-    editedData.quantifier.properties.includes('LOOPING') ||
-    editedData.quantifier.properties.includes('TIMES');
+    editedData.quantifier.properties.includes("LOOPING") ||
+    editedData.quantifier.properties.includes("TIMES");
   const handleModeChange = (isLoop: boolean) => {
-    const newProperties: QuantifierProperty[] = isLoop ? ['LOOPING'] : ['SINGLE'];
+    const newProperties: QuantifierProperty[] = isLoop
+      ? ["LOOPING"]
+      : ["SINGLE"];
     if (!isLoop && isOptional) {
-      newProperties.push('OPTIONAL');
+      newProperties.push("OPTIONAL");
     }
-    handleDataChange('quantifier', { ...editedData.quantifier, properties: newProperties });
+    handleDataChange("quantifier", {
+      ...editedData.quantifier,
+      properties: newProperties,
+    });
     if (isLoop && !editedData.times) {
-      handleDataChange('times', { from: 1, to: 1, windowTime: null });
+      handleDataChange("times", { from: 1, to: 1, windowTime: null });
     }
   };
   const handleOptionalChange = (checked: boolean) => {
-    const newProperties: QuantifierProperty[] = [...editedData.quantifier.properties].filter(
-      (p) => p !== 'OPTIONAL'
-    );
+    const newProperties: QuantifierProperty[] = [
+      ...editedData.quantifier.properties,
+    ].filter(p => p !== "OPTIONAL");
     if (checked) {
-      newProperties.push('OPTIONAL');
+      newProperties.push("OPTIONAL");
     }
-    handleDataChange('quantifier', { ...editedData.quantifier, properties: newProperties });
+    handleDataChange("quantifier", {
+      ...editedData.quantifier,
+      properties: newProperties,
+    });
   };
 
   return (
     <Box
       sx={{
-        border: '1px solid',
-        borderColor: selected ? 'primary.main' : 'grey.400',
-        borderRadius: '5px',
+        border: "1px solid",
+        borderColor: selected ? "primary.main" : "grey.400",
+        borderRadius: "5px",
         p: 0,
-        cursor: 'pointer',
-        backgroundColor: 'background.paper',
+        cursor: "pointer",
+        backgroundColor: "background.paper",
         width: 350,
       }}
     >
@@ -176,10 +189,10 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         type="target"
         position={Position.Left}
         style={{
-          width: '12px',
-          height: '12px',
-          borderRadius: '3px',
-          backgroundColor: '#0000ff',
+          width: "12px",
+          height: "12px",
+          borderRadius: "3px",
+          backgroundColor: "#0000ff",
         }}
       />
 
@@ -189,11 +202,11 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         alignItems="center"
         gap={1}
         sx={{
-          width: '100%',
+          width: "100%",
           p: 1,
-          backgroundColor: 'background.neutral',
-          borderTopLeftRadius: '5px',
-          borderTopRightRadius: '5px',
+          backgroundColor: "background.neutral",
+          borderTopLeftRadius: "5px",
+          borderTopRightRadius: "5px",
         }}
       >
         <Icon icon="material-icon-theme:simulink" width={20} height={20} />
@@ -226,11 +239,16 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         )}
       </Stack>
 
-      <Box sx={{ p: '8px 16px', width: '100%' }}>
+      <Box sx={{ p: "8px 16px", width: "100%" }}>
         <Stack spacing={0.5}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <Icon icon="mdi:repeat" color='text.secondary' width={16} height={16} />
-            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+            <Icon
+              icon="mdi:repeat"
+              color="text.secondary"
+              width={16}
+              height={16}
+            />
+            <Typography variant="body2" sx={{ fontWeight: "medium" }}>
               {getQuantifierText(data)}
             </Typography>
           </Stack>
@@ -238,30 +256,30 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
           <Stack direction="row" alignItems="flex-start" spacing={1}>
             <Icon
               icon="mdi:code-tags"
-              color='text.secondary'
+              color="text.secondary"
               width={16}
               height={16}
-              style={{ marginTop: '4px', flexShrink: 0 }}
+              style={{ marginTop: "4px", flexShrink: 0 }}
             />
             {data.condition ? (
               <Tooltip title={data.condition} placement="bottom-start" arrow>
                 <Typography
                   variant="body2"
                   sx={{
-                    color: 'text.secondary',
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
+                    color: "text.secondary",
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
                     WebkitLineClamp: 2,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    wordBreak: 'break-all',
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    wordBreak: "break-all",
                   }}
                 >
                   {data.condition}
                 </Typography>
               </Tooltip>
             ) : (
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 无触发条件
               </Typography>
             )}
@@ -271,11 +289,11 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
             <Stack direction="row" alignItems="center" spacing={1}>
               <Icon
                 icon="mdi:clock-outline"
-                color='text.secondary'
+                color="text.secondary"
                 width={16}
                 height={16}
               />
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 {` within ${data.window.time.size} ${mapUnitToText(data.window.time.unit)}`}
               </Typography>
             </Stack>
@@ -290,19 +308,23 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
           alignItems="center"
           spacing={0.5}
           sx={{
-            backgroundColor: 'background.paper',
-            borderRadius: '5px',
-            p: '2px 4px',
+            backgroundColor: "background.paper",
+            borderRadius: "5px",
+            p: "2px 4px",
             boxShadow: 3,
           }}
         >
-          <IconButton size="small" color="error" onClick={handleOpenDeleteDialog}>
-            {' '}
-            <Icon icon="mdi:delete" />{' '}
+          <IconButton
+            size="small"
+            color="error"
+            onClick={handleOpenDeleteDialog}
+          >
+            {" "}
+            <Icon icon="mdi:delete" />{" "}
           </IconButton>
           <IconButton size="small" color="info" onClick={handleOpenEditDialog}>
-            {' '}
-            <Icon icon="mdi:settings" />{' '}
+            {" "}
+            <Icon icon="mdi:settings" />{" "}
           </IconButton>
         </Stack>
       </NodeToolbar>
@@ -311,10 +333,10 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         type="source"
         position={Position.Right}
         style={{
-          width: '12px',
-          height: '12px',
-          borderRadius: '3px',
-          backgroundColor: '#00dddd',
+          width: "12px",
+          height: "12px",
+          borderRadius: "3px",
+          backgroundColor: "#00dddd",
         }}
       />
 
@@ -331,8 +353,8 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
             <TextField
               fullWidth
               label="步骤名称"
-              value={editedData.label || ''}
-              onChange={(e) => handleDataChange('label', e.target.value)}
+              value={editedData.label || ""}
+              onChange={e => handleDataChange("label", e.target.value)}
               helperText="为这个用户行为起一个明确的名字"
             />
             <Divider />
@@ -343,9 +365,9 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
               <FormControl fullWidth>
                 <InputLabel>发生模式</InputLabel>
                 <Select
-                  value={isLooping ? 'loop' : 'single'}
+                  value={isLooping ? "loop" : "single"}
                   label="发生模式"
-                  onChange={(e) => handleModeChange(e.target.value === 'loop')}
+                  onChange={e => handleModeChange(e.target.value === "loop")}
                 >
                   <MenuItem value="single">发生一次</MenuItem>
                   <MenuItem value="loop">循环发生</MenuItem>
@@ -355,7 +377,7 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                 control={
                   <Checkbox
                     checked={isOptional}
-                    onChange={(e) => handleOptionalChange(e.target.checked)}
+                    onChange={e => handleOptionalChange(e.target.checked)}
                   />
                 }
                 label="可选发生"
@@ -368,8 +390,8 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   type="number"
                   label="从 (From)"
                   value={editedData.times?.from || 1}
-                  onChange={(e) =>
-                    handleDataChange('times', {
+                  onChange={e =>
+                    handleDataChange("times", {
                       ...editedData.times!,
                       from: Number(e.target.value),
                     })
@@ -379,8 +401,11 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   type="number"
                   label="到 (To)"
                   value={editedData.times?.to || 1}
-                  onChange={(e) =>
-                    handleDataChange('times', { ...editedData.times!, to: Number(e.target.value) })
+                  onChange={e =>
+                    handleDataChange("times", {
+                      ...editedData.times!,
+                      to: Number(e.target.value),
+                    })
                   }
                 />
               </Stack>
@@ -394,8 +419,8 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
               multiline
               rows={4}
               label="具体触发条件"
-              value={editedData.condition || ''}
-              onChange={(e) => handleDataChange('condition', e.target.value)}
+              value={editedData.condition || ""}
+              onChange={e => handleDataChange("condition", e.target.value)}
               helperText="定义满足此步骤需要匹配的事件规则"
             />
             <Divider />
@@ -406,12 +431,15 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
               control={
                 <Checkbox
                   checked={!!editedData.window}
-                  onChange={(e) =>
+                  onChange={e =>
                     handleDataChange(
-                      'window',
+                      "window",
                       e.target.checked
-                        ? { type: 'FIRST_AND_LAST', time: { unit: 'SECONDS', size: 60 } }
-                        : undefined
+                        ? {
+                            type: "FIRST_AND_LAST",
+                            time: { unit: "SECONDS", size: 60 },
+                          }
+                        : undefined,
                     )
                   }
                 />
@@ -425,10 +453,13 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   type="number"
                   label="时长"
                   value={editedData.window.time.size}
-                  onChange={(e) =>
-                    handleDataChange('window', {
+                  onChange={e =>
+                    handleDataChange("window", {
                       ...editedData.window!,
-                      time: { ...editedData.window!.time, size: Number(e.target.value) },
+                      time: {
+                        ...editedData.window!.time,
+                        size: Number(e.target.value),
+                      },
                     })
                   }
                 />
@@ -437,10 +468,13 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   <Select
                     value={editedData.window.time.unit}
                     label="单位"
-                    onChange={(e) =>
-                      handleDataChange('window', {
+                    onChange={e =>
+                      handleDataChange("window", {
                         ...editedData.window!,
-                        time: { ...editedData.window!.time, unit: e.target.value as TimeUnit },
+                        time: {
+                          ...editedData.window!.time,
+                          unit: e.target.value as TimeUnit,
+                        },
                       })
                     }
                   >
@@ -471,7 +505,11 @@ const AtomicNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog}>取消</Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
             确认删除
           </Button>
         </DialogActions>

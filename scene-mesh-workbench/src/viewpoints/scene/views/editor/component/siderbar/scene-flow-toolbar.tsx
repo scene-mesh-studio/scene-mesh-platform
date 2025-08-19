@@ -1,15 +1,15 @@
-import type { IEntityObject } from '@scenemesh/entity-engine';
-import type { SceneFlowEdge, SceneFlowNode } from '../scene-flow-types';
+import type { IEntityObject } from "@scenemesh/entity-engine";
+import type { SceneFlowEdge, SceneFlowNode } from "../scene-flow-types";
 
-import { useReactFlow } from '@xyflow/react';
+import { useReactFlow } from "@xyflow/react";
 
-import { Stack, Button } from '@mui/material';
+import { Stack, Button } from "@mui/material";
 
-import { toast } from 'sonner';
-import { Icon } from '@iconify/react';
+import { toast } from "sonner";
+import { Icon } from "@iconify/react";
 
-import { validateFlow } from '../utils/flow-exporter';
-import { generateWhenThenJson } from '../utils/flow-outputter';
+import { validateFlow } from "../utils/flow-exporter";
+import { generateWhenThenJson } from "../utils/flow-outputter";
 
 type SceneFlowToolbarProps = {
   handleSceneFlowSave: () => void;
@@ -19,22 +19,27 @@ type SceneFlowToolbarProps = {
 
 export function SceneFlowToolbar(props: SceneFlowToolbarProps) {
   const { handleSceneFlowSave, handleSceneFlowPublish, scene } = props;
-  const { getNodes, getEdges, setNodes } = useReactFlow<SceneFlowNode, SceneFlowEdge>();
+  const { getNodes, getEdges, setNodes } = useReactFlow<
+    SceneFlowNode,
+    SceneFlowEdge
+  >();
 
   function handleFlowPublish() {
     const { errors, nodes: validatedNodes } = validateFlow(
       getNodes(),
       getEdges(),
-      true // <-- 传入 true
+      true, // <-- 传入 true
     );
     setNodes(validatedNodes);
     if (errors.length > 0) {
-      const errorMsgs = errors.map((error, index) => <li key={index}>- {error.message}</li>);
+      const errorMsgs = errors.map((error, index) => (
+        <li key={index}>- {error.message}</li>
+      ));
       toast.error(
         <>
           <div>场景流程设计校验失败, 请先解决这些问题:</div>
           <ul>{errorMsgs}</ul>
-        </>
+        </>,
       );
       return;
     }
@@ -53,7 +58,7 @@ export function SceneFlowToolbar(props: SceneFlowToolbarProps) {
     const { nodes: validatedNodes } = validateFlow(
       getNodes(),
       getEdges(),
-      true // <-- 传入 true
+      true, // <-- 传入 true
     );
 
     // 2. 使用返回的、已附加错误信息的新节点数组来更新 React Flow 的状态
@@ -79,7 +84,12 @@ export function SceneFlowToolbar(props: SceneFlowToolbarProps) {
         }}
         variant="text"
         startIcon={
-          <Icon icon="mdi:content-save" width={24} height={24} color='primary' />
+          <Icon
+            icon="mdi:content-save"
+            width={24}
+            height={24}
+            color="primary"
+          />
         }
       >
         保存
@@ -89,21 +99,23 @@ export function SceneFlowToolbar(props: SceneFlowToolbarProps) {
           handleFlowValidate();
         }}
         variant="text"
-        startIcon={<Icon icon="material-icon-theme:test-ts" width={24} height={24} />}
+        startIcon={
+          <Icon icon="material-icon-theme:test-ts" width={24} height={24} />
+        }
       >
         校验
       </Button>
       <Button
         variant="text"
         startIcon={
-          <Icon icon="mdi:publish" width={24} height={24} color='primary' />
+          <Icon icon="mdi:publish" width={24} height={24} color="primary" />
         }
         onClick={handleFlowPublish}
       >
         发布
         {scene.values?.flowDataPublishTime
-          ? '(上次发布于: ' + scene.values.flowDataPublishTime + ' )'
-          : ''}
+          ? "(上次发布于: " + scene.values.flowDataPublishTime + " )"
+          : ""}
       </Button>
     </Stack>
   );

@@ -7,12 +7,12 @@ import type {
   ICepPatternNode,
   FlinkCEP_Pattern,
   IComputePatternNode,
-} from '../scene-flow-types'; // Ensure this path is correct for your project structure
+} from "../scene-flow-types"; // Ensure this path is correct for your project structure
 
-import { createId } from '@paralleldrive/cuid2';
+import { createId } from "@paralleldrive/cuid2";
 
-const GROUP_NODE_TYPE = 'composite';
-const ATOMIC_NODE_TYPE = 'atomic';
+const GROUP_NODE_TYPE = "composite";
+const ATOMIC_NODE_TYPE = "atomic";
 
 /**
  * Recursively processes the graph structure from the backend, creating unique IDs for nodes
@@ -29,7 +29,7 @@ function processGraph(
   allNodes: SceneFlowNode[],
   allEdges: SceneFlowEdge[],
   parentId: string | null,
-  nameToIdMap: Map<string, string>
+  nameToIdMap: Map<string, string>,
 ) {
   // --- LAYOUT LOGIC CHANGED TO HORIZONTAL ---
   const PADDING = 80; // Padding from the parent's border.
@@ -44,9 +44,10 @@ function processGraph(
 
     let newNode: SceneFlowNode | null = null;
 
-    if (backendNode.type === 'ATOMIC' || backendNode.type === 'COMPOSITE') {
+    if (backendNode.type === "ATOMIC" || backendNode.type === "COMPOSITE") {
       const cepNode = backendNode as ICepPatternNode;
-      const nodeType = cepNode.type === 'COMPOSITE' ? GROUP_NODE_TYPE : ATOMIC_NODE_TYPE;
+      const nodeType =
+        cepNode.type === "COMPOSITE" ? GROUP_NODE_TYPE : ATOMIC_NODE_TYPE;
 
       newNode = {
         id: newId, // Use the new ID.
@@ -85,8 +86,8 @@ function processGraph(
     // If the node is a composite group, recurse into its own graph.
     // Pass the NEW ID as the parentId for the next level.
     if (
-      (backendNode.type === 'COMPOSITE' || backendNode.type === 'ATOMIC') &&
-      (backendNode as ICepPatternNode).type === 'COMPOSITE' &&
+      (backendNode.type === "COMPOSITE" || backendNode.type === "ATOMIC") &&
+      (backendNode as ICepPatternNode).type === "COMPOSITE" &&
       (backendNode as ICepPatternNode).graph
     ) {
       processGraph(
@@ -94,7 +95,7 @@ function processGraph(
         allNodes,
         allEdges,
         newId, // Pass the new unique ID as the parentId.
-        nameToIdMap
+        nameToIdMap,
       );
     }
   }
@@ -111,7 +112,7 @@ function processGraph(
         id: `e-${sourceId}-${targetId}`, // Edge ID based on new node IDs.
         source: sourceId, // Use the new source ID.
         target: targetId, // Use the new target ID.
-        type: 'strategy',
+        type: "strategy",
         data: {
           consumingStrategy: backendEdge.type,
         },
@@ -124,7 +125,7 @@ function processGraph(
     } else {
       // Log a warning if an edge points to a node name that wasn't found in the map.
       console.warn(
-        `Could not create edge for names [${backendEdge.source} -> ${backendEdge.target}] because one or both names could not be mapped to a new ID.`
+        `Could not create edge for names [${backendEdge.source} -> ${backendEdge.target}] because one or both names could not be mapped to a new ID.`,
       );
     }
   }

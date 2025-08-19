@@ -1,8 +1,14 @@
-import React from 'react';
-import { BaseEdge, useReactFlow, getBezierPath, EdgeLabelRenderer, type EdgeProps } from '@xyflow/react';
-import type { ConsumingStrategy } from '../scene-flow-types';
+import React from "react";
+import {
+  BaseEdge,
+  useReactFlow,
+  getBezierPath,
+  EdgeLabelRenderer,
+  type EdgeProps,
+} from "@xyflow/react";
+import type { ConsumingStrategy } from "../scene-flow-types";
 
-import { Button } from '@mui/material'; // 引入 Box 用于样式化
+import { Button } from "@mui/material"; // 引入 Box 用于样式化
 
 const StrategyEdge: React.FC<EdgeProps> = ({
   id,
@@ -28,25 +34,28 @@ const StrategyEdge: React.FC<EdgeProps> = ({
   });
 
   const consumingStrategy: ConsumingStrategy =
-    data?.consumingStrategy === 'STRICT' ? 'STRICT' : 'SKIP_TILL_NEXT';
+    data?.consumingStrategy === "STRICT" ? "STRICT" : "SKIP_TILL_NEXT";
 
   const edgeStyle = {
     ...style,
-    strokeDasharray: consumingStrategy === 'SKIP_TILL_NEXT' ? '5 5' : undefined,
+    strokeDasharray: consumingStrategy === "SKIP_TILL_NEXT" ? "5 5" : undefined,
     strokeWidth: 2,
   };
 
   const onEdgeClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     const nextStrategy: ConsumingStrategy =
-      consumingStrategy === 'STRICT' ? 'SKIP_TILL_NEXT' : 'STRICT';
-    setEdges((edges) =>
-      edges.map((edge) => {
+      consumingStrategy === "STRICT" ? "SKIP_TILL_NEXT" : "STRICT";
+    setEdges(edges =>
+      edges.map(edge => {
         if (edge.id === id) {
-          return { ...edge, data: { ...edge.data, consumingStrategy: nextStrategy } };
+          return {
+            ...edge,
+            data: { ...edge.data, consumingStrategy: nextStrategy },
+          };
         }
         return edge;
-      })
+      }),
     );
   };
 
@@ -80,18 +89,18 @@ const StrategyEdge: React.FC<EdgeProps> = ({
         <Button
           variant="contained"
           size="small"
-          color={consumingStrategy === 'STRICT' ? 'primary' : 'success'}
+          color={consumingStrategy === "STRICT" ? "primary" : "success"}
           onClick={onEdgeClick}
           className="nodrag nopan"
           sx={{
-            position: 'absolute',
+            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             zIndex: 1,
-            pointerEvents: 'all',
+            pointerEvents: "all",
             boxShadow: 1,
           }}
         >
-          {consumingStrategy === 'STRICT' ? '严格跟随' : '宽松跟随'}
+          {consumingStrategy === "STRICT" ? "严格跟随" : "宽松跟随"}
         </Button>
       </EdgeLabelRenderer>
     </>

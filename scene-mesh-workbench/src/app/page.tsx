@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { EntityViewContainer } from "@scenemesh/entity-engine";
 
@@ -10,5 +10,5 @@ export default function IndexPage() {
       viewName="mainDashboardView"
       baseObjectId="z1cv5emekgc0jpoyue65n5c4"
     />
-  )
+  );
 }

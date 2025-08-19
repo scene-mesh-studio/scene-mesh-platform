@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
-import { Handle, Position, NodeToolbar, useReactFlow, type NodeProps } from '@xyflow/react';
+import React, { useState } from "react";
+import {
+  Handle,
+  Position,
+  NodeToolbar,
+  useReactFlow,
+  type NodeProps,
+} from "@xyflow/react";
 import type {
   TimeUnit,
   SceneFlowNode,
   PatternNodeData,
   QuantifierProperty,
-} from '../scene-flow-types';
+} from "../scene-flow-types";
 
 // 导入所有需要的 Material-UI 组件
 import {
@@ -29,15 +35,15 @@ import {
   DialogActions,
   FormControlLabel,
   DialogContentText,
-} from '@mui/material';
+} from "@mui/material";
 
-import { Icon } from '@iconify/react';
+import { Icon } from "@iconify/react";
 
 // --- 辅助函数 ---
 const getQuantifierText = (data: PatternNodeData): string => {
   const props = data.quantifier.properties;
-  const isOptional = props.includes('OPTIONAL');
-  const isRepeating = props.includes('TIMES') || props.includes('LOOPING');
+  const isOptional = props.includes("OPTIONAL");
+  const isRepeating = props.includes("TIMES") || props.includes("LOOPING");
   let text: string;
   if (isRepeating && data.times) {
     if (data.times.from === data.times.to) {
@@ -46,13 +52,13 @@ const getQuantifierText = (data: PatternNodeData): string => {
       text = `重复 ${data.times.from} - ${data.times.to} 次`;
     }
   } else if (isRepeating) {
-    text = '循环发生';
+    text = "循环发生";
   } else {
-    text = '发生一次';
+    text = "发生一次";
   }
   if (isOptional) {
     if (!isRepeating) {
-      return '可选发生';
+      return "可选发生";
     }
     return `可选 (${text})`;
   }
@@ -61,22 +67,23 @@ const getQuantifierText = (data: PatternNodeData): string => {
 
 const mapUnitToText = (unit: TimeUnit): string => {
   const unitMap: Record<TimeUnit, string> = {
-    SECONDS: '秒',
-    MINUTES: '分钟',
-    HOURS: '小时',
-    DAYS: '天',
-    MILLISECONDS: '毫秒',
+    SECONDS: "秒",
+    MINUTES: "分钟",
+    HOURS: "小时",
+    DAYS: "天",
+    MILLISECONDS: "毫秒",
   };
   return unitMap[unit] || unit;
 };
 
 const getQuantifierIcon = (properties: QuantifierProperty[]): string => {
-  if (properties.includes('OPTIONAL')) return '?';
-  if (properties.includes('LOOPING') || properties.includes('TIMES')) return '+';
-  return '';
+  if (properties.includes("OPTIONAL")) return "?";
+  if (properties.includes("LOOPING") || properties.includes("TIMES"))
+    return "+";
+  return "";
 };
 
-const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
+const GroupNode: React.FC<NodeProps<SceneFlowNode>> = props => {
   const { id, data: nodeData, selected } = props;
   const { setNodes, getNodes, getEdges, setEdges } = useReactFlow();
   const data = nodeData as PatternNodeData;
@@ -94,67 +101,81 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
   const handleCloseDeleteDialog = () => setDeleteDialogOpen(false);
   const handleDataChange = <K extends keyof PatternNodeData>(
     field: K,
-    value: PatternNodeData[K]
+    value: PatternNodeData[K],
   ) => {
-    setEditedData((prev) => ({ ...prev, [field]: value }));
+    setEditedData(prev => ({ ...prev, [field]: value }));
   };
   const handleSave = () => {
-    setNodes((nds) => nds.map((node) => (node.id === id ? { ...node, data: editedData } : node)));
+    setNodes(nds =>
+      nds.map(node => (node.id === id ? { ...node, data: editedData } : node)),
+    );
     handleCloseEditDialog();
   };
   const handleConfirmDelete = () => {
     const allNodes = getNodes();
     const allEdges = getEdges();
     const getDescendantIds = (nodeId: string): string[] => {
-      const children = allNodes.filter((n) => n.parentId === nodeId);
+      const children = allNodes.filter(n => n.parentId === nodeId);
       if (children.length === 0) return [];
-      const descendantIds = children.map((c) => c.id);
-      children.forEach((c) => descendantIds.push(...getDescendantIds(c.id)));
+      const descendantIds = children.map(c => c.id);
+      children.forEach(c => descendantIds.push(...getDescendantIds(c.id)));
       return descendantIds;
     };
 
     const idsToDelete = [id, ...getDescendantIds(id)];
     const edgesToDelete = allEdges
-      .filter((edge) => idsToDelete.includes(edge.source) || idsToDelete.includes(edge.target))
-      .map((edge) => edge.id);
-    setNodes((nds) => nds.filter((node) => !idsToDelete.includes(node.id)));
-    setEdges((eds) => eds.filter((edge) => !edgesToDelete.includes(edge.id)));
+      .filter(
+        edge =>
+          idsToDelete.includes(edge.source) ||
+          idsToDelete.includes(edge.target),
+      )
+      .map(edge => edge.id);
+    setNodes(nds => nds.filter(node => !idsToDelete.includes(node.id)));
+    setEdges(eds => eds.filter(edge => !edgesToDelete.includes(edge.id)));
     handleCloseDeleteDialog();
   };
-  const isOptional = editedData.quantifier.properties.includes('OPTIONAL');
-  const isRepeating = editedData.quantifier.properties.includes('TIMES');
+  const isOptional = editedData.quantifier.properties.includes("OPTIONAL");
+  const isRepeating = editedData.quantifier.properties.includes("TIMES");
   const handleModeChange = (isRepeat: boolean) => {
-    const newProperties: QuantifierProperty[] = isRepeat ? ['TIMES'] : ['SINGLE'];
+    const newProperties: QuantifierProperty[] = isRepeat
+      ? ["TIMES"]
+      : ["SINGLE"];
     if (!isRepeat && isOptional) {
-      newProperties.push('OPTIONAL');
+      newProperties.push("OPTIONAL");
     }
-    handleDataChange('quantifier', { ...editedData.quantifier, properties: newProperties });
+    handleDataChange("quantifier", {
+      ...editedData.quantifier,
+      properties: newProperties,
+    });
     if (isRepeat && !editedData.times) {
-      handleDataChange('times', { from: 1, to: 1, windowTime: null });
+      handleDataChange("times", { from: 1, to: 1, windowTime: null });
     }
   };
   const handleOptionalChange = (checked: boolean) => {
-    const newProperties: QuantifierProperty[] = [...editedData.quantifier.properties].filter(
-      (p) => p !== 'OPTIONAL'
-    );
+    const newProperties: QuantifierProperty[] = [
+      ...editedData.quantifier.properties,
+    ].filter(p => p !== "OPTIONAL");
     if (checked) {
-      newProperties.push('OPTIONAL');
+      newProperties.push("OPTIONAL");
     }
-    handleDataChange('quantifier', { ...editedData.quantifier, properties: newProperties });
+    handleDataChange("quantifier", {
+      ...editedData.quantifier,
+      properties: newProperties,
+    });
   };
 
   return (
     <Box
       sx={{
-        border: '1px solid',
-        borderColor: selected ? 'primary.main' : 'grey.400',
-        borderRadius: '5px',
+        border: "1px solid",
+        borderColor: selected ? "primary.main" : "grey.400",
+        borderRadius: "5px",
         p: 0,
         m: 0,
-        backgroundColor: 'rgba(237, 247, 255, 0.3)',
-        width: '100%',
-        height: '100%',
-        position: 'relative',
+        backgroundColor: "rgba(237, 247, 255, 0.3)",
+        width: "100%",
+        height: "100%",
+        position: "relative",
         zIndex: -1,
       }}
     >
@@ -162,10 +183,10 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         type="target"
         position={Position.Left}
         style={{
-          width: '12px',
-          height: '12px',
-          borderRadius: '3px',
-          backgroundColor: '#0000ff',
+          width: "12px",
+          height: "12px",
+          borderRadius: "3px",
+          backgroundColor: "#0000ff",
         }}
       />
 
@@ -175,12 +196,12 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         alignItems="center"
         gap={1}
         sx={{
-          width: '100%',
+          width: "100%",
           p: 1,
-          backgroundColor: 'background.neutral',
-          borderTopLeftRadius: '5px',
-          borderTopRightRadius: '5px',
-          cursor: 'move',
+          backgroundColor: "background.neutral",
+          borderTopLeftRadius: "5px",
+          borderTopRightRadius: "5px",
+          cursor: "move",
         }}
       >
         <Icon icon="material-icon-theme:drawio" width={20} height={20} />
@@ -212,11 +233,16 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         )}
       </Stack>
 
-      <Box sx={{ p: '8px 16px', width: '100%' }}>
+      <Box sx={{ p: "8px 16px", width: "100%" }}>
         <Stack spacing={0.5}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <Icon icon="mdi:repeat" color='text.secondary' width={16} height={16} />
-            <Typography variant="caption" sx={{ fontWeight: 'medium' }}>
+            <Icon
+              icon="mdi:repeat"
+              color="text.secondary"
+              width={16}
+              height={16}
+            />
+            <Typography variant="caption" sx={{ fontWeight: "medium" }}>
               {getQuantifierText(data)}
             </Typography>
           </Stack>
@@ -225,22 +251,22 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
             <Stack direction="row" alignItems="flex-start" spacing={1}>
               <Icon
                 icon="mdi:code-tags"
-                color='text.secondary'
+                color="text.secondary"
                 width={16}
                 height={16}
-                style={{ marginTop: '2px', flexShrink: 0 }}
+                style={{ marginTop: "2px", flexShrink: 0 }}
               />
               <Tooltip title={data.condition} placement="bottom-start" arrow>
                 <Typography
                   variant="caption"
                   sx={{
-                    color: 'text.secondary',
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
+                    color: "text.secondary",
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
                     WebkitLineClamp: 1,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    wordBreak: 'break-all',
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    wordBreak: "break-all",
                   }}
                 >
                   {data.condition}
@@ -253,11 +279,11 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
             <Stack direction="row" alignItems="center" spacing={1}>
               <Icon
                 icon="mdi:clock-outline"
-                color='text.secondary'
+                color="text.secondary"
                 width={16}
                 height={16}
               />
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 {` within ${data.window.time.size} ${mapUnitToText(data.window.time.unit)}`}
               </Typography>
             </Stack>
@@ -273,13 +299,17 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
           alignItems="center"
           spacing={0.5}
           sx={{
-            backgroundColor: 'background.paper',
-            borderRadius: '5px',
-            p: '2px 4px',
+            backgroundColor: "background.paper",
+            borderRadius: "5px",
+            p: "2px 4px",
             boxShadow: 3,
           }}
         >
-          <IconButton size="small" color="error" onClick={handleOpenDeleteDialog}>
+          <IconButton
+            size="small"
+            color="error"
+            onClick={handleOpenDeleteDialog}
+          >
             <Icon icon="mdi:delete" />
           </IconButton>
           <IconButton size="small" color="info" onClick={handleOpenEditDialog}>
@@ -292,10 +322,10 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         type="source"
         position={Position.Right}
         style={{
-          width: '12px',
-          height: '12px',
-          borderRadius: '3px',
-          backgroundColor: '#00dddd',
+          width: "12px",
+          height: "12px",
+          borderRadius: "3px",
+          backgroundColor: "#00dddd",
         }}
       />
 
@@ -312,8 +342,8 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
             <TextField
               fullWidth
               label="分组名称"
-              value={editedData.label || ''}
-              onChange={(e) => handleDataChange('label', e.target.value)}
+              value={editedData.label || ""}
+              onChange={e => handleDataChange("label", e.target.value)}
               helperText="为这个分组行为起一个明确的名字"
             />
             <Divider />
@@ -324,9 +354,9 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
               <FormControl fullWidth>
                 <InputLabel>发生模式</InputLabel>
                 <Select
-                  value={isRepeating ? 'times' : 'single'}
+                  value={isRepeating ? "times" : "single"}
                   label="发生模式"
-                  onChange={(e) => handleModeChange(e.target.value === 'times')}
+                  onChange={e => handleModeChange(e.target.value === "times")}
                 >
                   <MenuItem value="single">发生一次</MenuItem>
                   <MenuItem value="times">重复组</MenuItem>
@@ -336,7 +366,7 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                 control={
                   <Checkbox
                     checked={isOptional}
-                    onChange={(e) => handleOptionalChange(e.target.checked)}
+                    onChange={e => handleOptionalChange(e.target.checked)}
                   />
                 }
                 label="可选发生"
@@ -349,8 +379,8 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   type="number"
                   label="从 (From)"
                   value={editedData.times?.from || 1}
-                  onChange={(e) =>
-                    handleDataChange('times', {
+                  onChange={e =>
+                    handleDataChange("times", {
                       ...editedData.times!,
                       from: Number(e.target.value),
                     })
@@ -360,8 +390,11 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   type="number"
                   label="到 (To)"
                   value={editedData.times?.to || 1}
-                  onChange={(e) =>
-                    handleDataChange('times', { ...editedData.times!, to: Number(e.target.value) })
+                  onChange={e =>
+                    handleDataChange("times", {
+                      ...editedData.times!,
+                      to: Number(e.target.value),
+                    })
                   }
                 />
               </Stack>
@@ -375,8 +408,8 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
               multiline
               rows={4}
               label="具体触发条件"
-              value={editedData.condition || ''}
-              onChange={(e) => handleDataChange('condition', e.target.value)}
+              value={editedData.condition || ""}
+              onChange={e => handleDataChange("condition", e.target.value)}
               helperText="应用于整个分组的条件"
             />
             <Divider />
@@ -387,12 +420,15 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
               control={
                 <Checkbox
                   checked={!!editedData.window}
-                  onChange={(e) =>
+                  onChange={e =>
                     handleDataChange(
-                      'window',
+                      "window",
                       e.target.checked
-                        ? { type: 'FIRST_AND_LAST', time: { unit: 'SECONDS', size: 60 } }
-                        : undefined
+                        ? {
+                            type: "FIRST_AND_LAST",
+                            time: { unit: "SECONDS", size: 60 },
+                          }
+                        : undefined,
                     )
                   }
                 />
@@ -406,10 +442,13 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   type="number"
                   label="时长"
                   value={editedData.window.time.size}
-                  onChange={(e) =>
-                    handleDataChange('window', {
+                  onChange={e =>
+                    handleDataChange("window", {
                       ...editedData.window!,
-                      time: { ...editedData.window!.time, size: Number(e.target.value) },
+                      time: {
+                        ...editedData.window!.time,
+                        size: Number(e.target.value),
+                      },
                     })
                   }
                 />
@@ -418,8 +457,8 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
                   <Select
                     value={editedData.window.time.unit}
                     label="单位"
-                    onChange={(e) =>
-                      handleDataChange('window', {
+                    onChange={e =>
+                      handleDataChange("window", {
                         ...editedData.window!,
                         time: {
                           ...editedData.window!.time,
@@ -457,7 +496,11 @@ const GroupNode: React.FC<NodeProps<SceneFlowNode>> = (props) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog}>取消</Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
             确认删除
           </Button>
         </DialogActions>

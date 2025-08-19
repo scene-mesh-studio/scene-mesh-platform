@@ -1,6 +1,6 @@
-import { ReactNode, useContext, createContext } from 'react';
+import { ReactNode, useContext, createContext } from "react";
 // NodeContext.js
-import type { IEntityObject } from '@scenemesh/entity-engine';
+import type { IEntityObject } from "@scenemesh/entity-engine";
 
 interface SceneFlowEditorContextType {
   product: IEntityObject;
@@ -9,7 +9,7 @@ interface SceneFlowEditorContextType {
 
 // 创建 Context，可以提供一个默认值
 export const SceneFlowEditorContext = createContext<SceneFlowEditorContextType>(
-  {} as SceneFlowEditorContextType
+  {} as SceneFlowEditorContextType,
 );
 
 export function SceneFlowEditorProvider({
@@ -29,4 +29,5 @@ export function SceneFlowEditorProvider({
 }
 
 // 创建一个自定义 Hook，方便在组件中使用
-export const useSceneFlowEditorContext = () => useContext(SceneFlowEditorContext);
+export const useSceneFlowEditorContext = () =>
+  useContext(SceneFlowEditorContext);

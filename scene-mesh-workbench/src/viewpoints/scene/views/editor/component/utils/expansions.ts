@@ -1,4 +1,4 @@
-import type { Node, Dimensions, XYPosition } from '@xyflow/react';
+import type { Node, Dimensions, XYPosition } from "@xyflow/react";
 
 type Expansion = {
   dimension: Dimensions;
@@ -20,12 +20,19 @@ function resolveExpansion(parent: Node, childBounds: Bounds): Expansion {
 
   // We check if there is even is an expansion happening
   const changed =
-    dimension.width !== width || dimension.height !== height || offset.x !== 0 || offset.y !== 0;
+    dimension.width !== width ||
+    dimension.height !== height ||
+    offset.x !== 0 ||
+    offset.y !== 0;
 
   return { dimension, offset, position, changed };
 }
 
-export function expandGroupNodes<T extends Node>(nodes: T[], padding = 25, headerHeight = 0) {
+export function expandGroupNodes<T extends Node>(
+  nodes: T[],
+  padding = 25,
+  headerHeight = 0,
+) {
   // A map for the children of each parent node
   const childMap = new Map<string, Node[]>();
   // A lookup of the parent nodes themselves
@@ -83,7 +90,7 @@ export function expandGroupNodes<T extends Node>(nodes: T[], padding = 25, heade
         y1: Infinity,
         x2: -Infinity,
         y2: -Infinity,
-      }
+      },
     );
 
     const expansion = resolveExpansion(parent, childBounds);
@@ -94,9 +101,9 @@ export function expandGroupNodes<T extends Node>(nodes: T[], padding = 25, heade
     }
   }
 
-  const newNodes = nodes.map((node) => {
+  const newNodes = nodes.map(node => {
     const expansion = parentExpansions.get(node.id);
-    const parentExpansion = parentExpansions.get(node.parentId ?? '');
+    const parentExpansion = parentExpansions.get(node.parentId ?? "");
 
     // node can be parent and child at the same time
     // and both expansions can happen at once

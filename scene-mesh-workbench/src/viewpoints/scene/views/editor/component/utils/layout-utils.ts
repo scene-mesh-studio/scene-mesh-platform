@@ -1,7 +1,7 @@
-import type { Node } from '@xyflow/react';
-import type { SceneFlowNode } from '../scene-flow-types';
+import type { Node } from "@xyflow/react";
+import type { SceneFlowNode } from "../scene-flow-types";
 
-import dagre from 'dagre';
+import dagre from "dagre";
 
 const dagreGraph = new dagre.graphlib.Graph({ compound: true }); // 使用复合图以更好支持层级
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -27,21 +27,28 @@ const getNodeHeight = (node: SceneFlowNode): number =>
         ? Number(node.height)
         : nodeHeight;
 
-export const getLayoutedElements = (nodes: any[], edges: any[], direction = 'LR') => {
+export const getLayoutedElements = (
+  nodes: any[],
+  edges: any[],
+  direction = "LR",
+) => {
   // dagreGraph.setGraph({ rankdir: direction, align: 'UL', nodesep: 50, ranksep: 100 });
 
   dagreGraph.setGraph({ rankdir: direction });
 
   // 同时设置节点和它们的层级关系
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: getNodeWidth(node), height: getNodeHeight(node) });
+  nodes.forEach(node => {
+    dagreGraph.setNode(node.id, {
+      width: getNodeWidth(node),
+      height: getNodeHeight(node),
+    });
     // 如果有父节点，告诉 Dagre 这种嵌套关系
     if (node.parentNode) {
       dagreGraph.setParent(node.id, node.parentNode);
     }
   });
 
-  edges.forEach((edge) => {
+  edges.forEach(edge => {
     dagreGraph.setEdge(edge.source, edge.target);
   });
 
@@ -50,11 +57,11 @@ export const getLayoutedElements = (nodes: any[], edges: any[], direction = 'LR'
 
   // 创建一个方便查找节点绝对位置的 Map
   const nodePositions = new Map();
-  dagreGraph.nodes().forEach((nodeId) => {
+  dagreGraph.nodes().forEach(nodeId => {
     nodePositions.set(nodeId, dagreGraph.node(nodeId));
   });
 
-  const layoutedNodes = nodes.map((node) => {
+  const layoutedNodes = nodes.map(node => {
     const nodeWithPosition = nodePositions.get(node.id);
 
     // 检查是否有父节点
@@ -85,7 +92,7 @@ export const getLayoutedElements = (nodes: any[], edges: any[], direction = 'LR'
 export const getCorrectedPosition = (
   draggedNode: SceneFlowNode,
   parentNode: SceneFlowNode,
-  headerHeight: number
+  headerHeight: number,
 ): { x: number; y: number } => {
   const padding = 10;
   const contentArea = {
@@ -96,14 +103,20 @@ export const getCorrectedPosition = (
   };
 
   return {
-    x: Math.max(contentArea.minX, Math.min(draggedNode.position.x, contentArea.maxX)),
-    y: Math.max(contentArea.minY, Math.min(draggedNode.position.y, contentArea.maxY)),
+    x: Math.max(
+      contentArea.minX,
+      Math.min(draggedNode.position.x, contentArea.maxX),
+    ),
+    y: Math.max(
+      contentArea.minY,
+      Math.min(draggedNode.position.y, contentArea.maxY),
+    ),
   };
 };
 
 export const getAbsolutePosition = (
   nodeId: string,
-  getNode: (id: string) => Node | undefined
+  getNode: (id: string) => Node | undefined,
 ): { x: number; y: number } => {
   let currentNode = getNode(nodeId);
   if (!currentNode) {
@@ -140,7 +153,7 @@ export function recursivelyResizeAncestors(
   getNodes: () => Node[],
   getNode: (id: string) => Node | undefined,
   setNodes: (nodes: any[]) => void,
-  padding: number = 20 // <--- 关键修改 1: 添加为参数并设置默认值
+  padding: number = 20, // <--- 关键修改 1: 添加为参数并设置默认值
 ) {
   const node = getNode(nodeId);
 
@@ -153,10 +166,10 @@ export function recursivelyResizeAncestors(
     return;
   }
 
-  console.log('------- ' + JSON.stringify(parentNode));
+  console.log("------- " + JSON.stringify(parentNode));
 
   const allNodes = getNodes();
-  const childNodes = allNodes.filter((n) => n.parentId === parentNode.id);
+  const childNodes = allNodes.filter(n => n.parentId === parentNode.id);
 
   if (childNodes.length === 0) {
     return;
@@ -167,7 +180,7 @@ export function recursivelyResizeAncestors(
   let maxX = 0;
   let maxY = 0;
 
-  childNodes.forEach((child) => {
+  childNodes.forEach(child => {
     console.log(`[Resize] Child ${JSON.stringify(child)}`);
     if (child.width && child.height) {
       const { x, y } = child.position;
@@ -196,10 +209,11 @@ export function recursivelyResizeAncestors(
   const parentCurrentHeight = parentNode.height || 0;
 
   const hasSizeChanged =
-    Math.abs(parentCurrentWidth - newWidth) > 1 || Math.abs(parentCurrentHeight - newHeight) > 1;
+    Math.abs(parentCurrentWidth - newWidth) > 1 ||
+    Math.abs(parentCurrentHeight - newHeight) > 1;
 
   if (hasSizeChanged) {
-    const newNodes = allNodes.map((n) => {
+    const newNodes = allNodes.map(n => {
       if (n.id === parentNode.id) {
         return {
           ...n,
@@ -214,7 +228,13 @@ export function recursivelyResizeAncestors(
 
     setTimeout(() => {
       // 在递归调用时，将 padding 值继续传递下去
-      recursivelyResizeAncestors(parentNode.id, getNodes, getNode, setNodes, padding);
+      recursivelyResizeAncestors(
+        parentNode.id,
+        getNodes,
+        getNode,
+        setNodes,
+        padding,
+      );
     }, 0);
   }
 }

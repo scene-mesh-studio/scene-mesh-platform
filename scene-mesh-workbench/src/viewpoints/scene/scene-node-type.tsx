@@ -1,5 +1,5 @@
-import { Handle, Position } from '@xyflow/react';
-import { Box, Stack, IconButton, Typography } from '@mui/material';
+import { Handle, Position } from "@xyflow/react";
+import { Box, Stack, IconButton, Typography } from "@mui/material";
 import { Icon } from "@iconify/react";
 
 export function SceneNode({ data }: { data: any }) {
@@ -7,8 +7,8 @@ export function SceneNode({ data }: { data: any }) {
     <Box
       sx={{
         borderRadius: 1,
-        border: '1px solid',
-        borderColor: 'divider',
+        border: "1px solid",
+        borderColor: "divider",
         minWidth: 300,
         p: 0,
       }}
@@ -22,14 +22,14 @@ export function SceneNode({ data }: { data: any }) {
           alignItems="center"
           sx={{
             px: 1,
-            width: '100%',
-            bgcolor: 'background.neutral',
-            borderRadius: '6px 6px 0 0',
+            width: "100%",
+            bgcolor: "background.neutral",
+            borderRadius: "6px 6px 0 0",
           }}
         >
           <Icon icon="material-icon-theme:webpack" width={24} height={24} />
           <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-            {data.values?.name || '场景节点'}
+            {data.values?.name || "场景节点"}
           </Typography>
           <IconButton color="primary">
             <Icon icon="mingcute:edit-line" width={16} height={16} />
@@ -38,9 +38,9 @@ export function SceneNode({ data }: { data: any }) {
         <Box
           sx={{
             p: 2,
-            width: '100%',
-            bgcolor: 'background.default',
-            borderRadius: '0 0 6px 6px',
+            width: "100%",
+            bgcolor: "background.default",
+            borderRadius: "0 0 6px 6px",
           }}
         >
           <Typography variant="caption">场景类型</Typography>

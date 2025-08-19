@@ -1,4 +1,4 @@
-import type { Node, Edge } from '@xyflow/react';
+import type { Node, Edge } from "@xyflow/react";
 
 // =================================================================
 // 基础类型定义
@@ -20,29 +20,34 @@ export interface FlowNodeTemplateCatalog {
 // =================================================================
 // 1. 类型标识符：将所有节点类型集中管理
 // =================================================================
-export type CepNodeType = 'ATOMIC' | 'COMPOSITE';
-export type ComputeNodeType = 'LLM_INFERENCE' | 'SCRIPT' | 'FORMAT_OUTPUT';
+export type CepNodeType = "ATOMIC" | "COMPOSITE";
+export type ComputeNodeType = "LLM_INFERENCE" | "SCRIPT" | "FORMAT_OUTPUT";
 export type AllNodeTypes = CepNodeType | ComputeNodeType;
 
 // =================================================================
 // CEP 相关类型定义
 // =================================================================
 export type QuantifierProperty =
-  | 'SINGLE'
-  | 'OPTIONAL'
-  | 'LOOPING'
-  | 'TIMES'
-  | 'TIMES_OR_MORE'
-  | 'GREEDY';
-export type ConsumingStrategy = 'SKIP_TILL_NEXT' | 'STRICT' | 'SKIP_TILL_ANY';
-export type TimeUnit = 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+  | "SINGLE"
+  | "OPTIONAL"
+  | "LOOPING"
+  | "TIMES"
+  | "TIMES_OR_MORE"
+  | "GREEDY";
+export type ConsumingStrategy = "SKIP_TILL_NEXT" | "STRICT" | "SKIP_TILL_ANY";
+export type TimeUnit =
+  | "MILLISECONDS"
+  | "SECONDS"
+  | "MINUTES"
+  | "HOURS"
+  | "DAYS";
 
 export interface TimeSpec {
   unit: TimeUnit;
   size: number;
 }
 export interface CepWindow {
-  type: 'FIRST_AND_LAST';
+  type: "FIRST_AND_LAST";
   time: TimeSpec;
 }
 export interface CepTimes {
@@ -56,7 +61,7 @@ export interface CepQuantifier {
   properties: QuantifierProperty[];
 }
 export interface CepCondition {
-  type: 'AVIATOR';
+  type: "AVIATOR";
   expression: string;
 }
 
@@ -76,11 +81,14 @@ export interface BaseComputeNodeData extends Record<string, unknown> {
 
 // 大模型推理节点
 export interface LlmNodeData extends BaseComputeNodeData {
-  type: 'LLM_INFERENCE';
+  type: "LLM_INFERENCE";
   modelProvider: string;
   model: string;
   promptTemplate: string;
-  promptVariables: { variable: string; value: string | number | boolean | null }[];
+  promptVariables: {
+    variable: string;
+    value: string | number | boolean | null;
+  }[];
   temperature?: number;
   topP?: number;
   mcps: string[];
@@ -89,21 +97,27 @@ export interface LlmNodeData extends BaseComputeNodeData {
 
 // 脚本计算节点
 export interface ScriptNodeData extends BaseComputeNodeData {
-  type: 'SCRIPT';
-  language: 'javascript';
+  type: "SCRIPT";
+  language: "javascript";
   script: string;
 }
 
 // 制定输出节点
 export interface FormatOutputNodeData extends BaseComputeNodeData {
-  type: 'FORMAT_OUTPUT';
-  outputActions: Array<{ actionId: string; values: { fieldName: string; value: any }[] }>;
+  type: "FORMAT_OUTPUT";
+  outputActions: Array<{
+    actionId: string;
+    values: { fieldName: string; value: any }[];
+  }>;
 }
 
 // =================================================================
 // “计算节点” 的联合类型
 // =================================================================
-export type ComputeNodeData = LlmNodeData | ScriptNodeData | FormatOutputNodeData;
+export type ComputeNodeData =
+  | LlmNodeData
+  | ScriptNodeData
+  | FormatOutputNodeData;
 
 // =================================================================
 // “模式匹配节点” 的类型定义
@@ -141,7 +155,7 @@ export type SceneFlowEdge = Edge<StrategyEdgeData>; // <-- 已改回 CEP_Edge
 // CEP 模式节点
 export interface ICepPatternNode {
   name: string;
-  type: 'ATOMIC' | 'COMPOSITE';
+  type: "ATOMIC" | "COMPOSITE";
   quantifier: CepQuantifier;
   condition: CepCondition | null;
   graph: {
@@ -160,7 +174,7 @@ export interface ICepPatternNode {
 // 计算节点
 export interface ILlmPatternNode {
   name: string;
-  type: 'LLM_INFERENCE';
+  type: "LLM_INFERENCE";
   model: string;
   promptTemplate: string;
   inputVariables: Array<{ name: string; source: string }>;
@@ -168,18 +182,21 @@ export interface ILlmPatternNode {
 }
 export interface IScriptPatternNode {
   name: string;
-  type: 'SCRIPT';
-  language: 'javascript' | 'python';
+  type: "SCRIPT";
+  language: "javascript" | "python";
   script: string;
 }
 export interface IFormatOutputPatternNode {
   name: string;
-  type: 'FORMAT_OUTPUT';
+  type: "FORMAT_OUTPUT";
   outputMapping: Array<{ outputKey: string; inputValueSource: string }>;
 }
 
 // 计算节点的联合类型
-export type IComputePatternNode = ILlmPatternNode | IScriptPatternNode | IFormatOutputPatternNode;
+export type IComputePatternNode =
+  | ILlmPatternNode
+  | IScriptPatternNode
+  | IFormatOutputPatternNode;
 
 // 所有后端节点的联合类型
 export type IPatternNode = ICepPatternNode | IComputePatternNode;
@@ -205,11 +222,11 @@ export interface FlowValidationError {
   nodeId: string;
   nodeName: string;
   type:
-    | 'ISOLATED_NODE'
-    | 'MISSING_CONDITION'
-    | 'EMPTY_GROUP'
-    | 'CIRCULAR_DEPENDENCY'
-    | 'INVALID_SCRIPT'
-    | 'MISSING_MODEL';
+    | "ISOLATED_NODE"
+    | "MISSING_CONDITION"
+    | "EMPTY_GROUP"
+    | "CIRCULAR_DEPENDENCY"
+    | "INVALID_SCRIPT"
+    | "MISSING_MODEL";
   message: string;
 }

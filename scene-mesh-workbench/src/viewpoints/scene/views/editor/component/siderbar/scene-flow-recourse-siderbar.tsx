@@ -1,22 +1,27 @@
-import type { FlowNodeTemplate, FlowNodeTemplateCatalog } from '../scene-flow-types';
+import type {
+  FlowNodeTemplate,
+  FlowNodeTemplateCatalog,
+} from "../scene-flow-types";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
-import { Box, Stack, IconButton, Typography } from '@mui/material';
+import { Box, Stack, IconButton, Typography } from "@mui/material";
 
-import { Icon } from '@iconify/react';
+import { Icon } from "@iconify/react";
 
-import { useFlowDnD } from '../utils/dnd-context';
+import { useFlowDnD } from "../utils/dnd-context";
 
 // 命名修正
 export type SceneFlowResourceSidebarProps = {
   templateCatalogs: FlowNodeTemplateCatalog[];
 };
-export function SceneFlowResourceSidebar({ templateCatalogs }: SceneFlowResourceSidebarProps) {
+export function SceneFlowResourceSidebar({
+  templateCatalogs,
+}: SceneFlowResourceSidebarProps) {
   const [show, setShow] = useState(false);
 
   const handleShowTaggle = () => {
-    setShow((prev) => !prev);
+    setShow(prev => !prev);
   };
   return (
     <>
@@ -44,7 +49,11 @@ export function SceneFlowResourceSidebar({ templateCatalogs }: SceneFlowResource
           }}
         >
           <Icon
-            icon={show ? 'material-icon-theme:folder-app-open' : 'material-icon-theme:folder-app'}
+            icon={
+              show
+                ? "material-icon-theme:folder-app-open"
+                : "material-icon-theme:folder-app"
+            }
             width={32}
             height={32}
           />
@@ -55,17 +64,20 @@ export function SceneFlowResourceSidebar({ templateCatalogs }: SceneFlowResource
           sx={{
             gap: 2,
             p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: 'background.paper',
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: "background.paper",
             borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+            border: "1px solid",
+            borderColor: "divider",
+            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
           }}
         >
           {templateCatalogs.map((catalog, index) => (
-            <TemplateCatalog key={`catalog-${index}`} templateCatalog={catalog} />
+            <TemplateCatalog
+              key={`catalog-${index}`}
+              templateCatalog={catalog}
+            />
           ))}
         </Box>
       )}
@@ -83,18 +95,18 @@ function TemplateCatalog({ templateCatalog }: TemplateCatalogProps) {
   const onDragStart = useCallback(
     (evt: React.DragEvent<HTMLDivElement>, node: FlowNodeTemplate) => {
       setType?.(node);
-      evt.dataTransfer.effectAllowed = 'move';
+      evt.dataTransfer.effectAllowed = "move";
     },
-    [setType]
+    [setType],
   );
 
   return (
     <Box
       sx={{
-        width: '100%',
-        flexDirection: 'column',
+        width: "100%",
+        flexDirection: "column",
         gap: 1,
-        display: 'flex',
+        display: "flex",
       }}
     >
       <Typography variant="caption">{templateCatalog.title}</Typography>
@@ -105,19 +117,28 @@ function TemplateCatalog({ templateCatalog }: TemplateCatalogProps) {
           flexWrap="nowrap"
           gap={1}
           alignItems="flex-start"
-          onDragStart={(evt) => onDragStart(evt, node)}
+          onDragStart={evt => onDragStart(evt, node)}
           draggable
           sx={{
-            cursor: 'pointer',
+            cursor: "pointer",
             borderRadius: 0.5,
-            ':hover': {
-              backgroundColor: 'background.neutral',
+            ":hover": {
+              backgroundColor: "background.neutral",
             },
             p: 1,
           }}
         >
-          <Icon icon={node.icon || 'material-icon-theme:pdm'} width={24} height={24} />
-          <Stack direction="column" flexWrap="nowrap" gap={1} alignItems="flex-start">
+          <Icon
+            icon={node.icon || "material-icon-theme:pdm"}
+            width={24}
+            height={24}
+          />
+          <Stack
+            direction="column"
+            flexWrap="nowrap"
+            gap={1}
+            alignItems="flex-start"
+          >
             <Typography variant="subtitle2">{node.title}</Typography>
             <Typography variant="caption">{node.description}</Typography>
           </Stack>

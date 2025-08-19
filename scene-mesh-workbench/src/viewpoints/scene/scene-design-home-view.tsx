@@ -1,15 +1,22 @@
-'use client';
+"use client";
 
-import '@xyflow/react/dist/style.css';
-import { createId } from '@paralleldrive/cuid2';
-import React, { useRef, useMemo, useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import "@xyflow/react/dist/style.css";
+import { createId } from "@paralleldrive/cuid2";
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import {
   useAsync,
   EntityViewContainer,
   useEntityEngine,
   type EntityTreeNode,
   useMasterDetailViewContainer,
-} from '@scenemesh/entity-engine';
+} from "@scenemesh/entity-engine";
 import {
   NodeChange,
   EdgeChange,
@@ -22,7 +29,7 @@ import {
   applyNodeChanges,
   ReactFlowProvider,
   BackgroundVariant,
-} from '@xyflow/react';
+} from "@xyflow/react";
 
 import {
   Box,
@@ -32,25 +39,39 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-} from '@mui/material';
+} from "@mui/material";
 
-import { Icon } from '@iconify/react';
+import { Icon } from "@iconify/react";
 
-import { SceneNode } from './scene-node-type';
+import { SceneNode } from "./scene-node-type";
 
 const initialNodes = [
-  { id: '1', position: { x: 0, y: 0 }, type: 'scene', data: { label: '星宝根场景' } },
-  { id: '2', position: { x: 0, y: 100 }, type: 'scene', data: { label: '星宝学习场景' } },
+  {
+    id: "1",
+    position: { x: 0, y: 0 },
+    type: "scene",
+    data: { label: "星宝根场景" },
+  },
+  {
+    id: "2",
+    position: { x: 0, y: 100 },
+    type: "scene",
+    data: { label: "星宝学习场景" },
+  },
 ];
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 
-function setupNodesAndEdges(nodes: any[], edges: any[], rootNode: EntityTreeNode | null) {
+function setupNodesAndEdges(
+  nodes: any[],
+  edges: any[],
+  rootNode: EntityTreeNode | null,
+) {
   if (rootNode == null) return;
   if (rootNode.data?.id) {
     nodes.push({
       id: rootNode.data?.id,
       position: { x: 0, y: 0 },
-      type: 'scene',
+      type: "scene",
       data: rootNode.data,
     });
     if (rootNode.parentId) {
@@ -88,32 +109,34 @@ export function SceneDesignHomeView() {
       }
     }
     updateHeight();
-    window.addEventListener('resize', updateHeight);
-    return () => window.removeEventListener('resize', updateHeight);
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
   useAsync(async () => {
     const rs = await engine.datasourceFactory.getDataSource()?.findMany({
-      modelName: 'scene',
+      modelName: "scene",
       query: {
         pageIndex: 1,
         pageSize: 1,
         references: {
-          fromModelName: 'product',
-          fromFieldName: 'rootScene',
-          fromObjectId: currentAction?.contextObject?.id || '',
-          toModelName: 'scene',
+          fromModelName: "product",
+          fromFieldName: "rootScene",
+          fromObjectId: currentAction?.contextObject?.id || "",
+          toModelName: "scene",
         },
       },
     });
     if (rs && rs.data && rs.data.length > 0) {
       const rootScene = rs.data[0];
       setRootSceneId(rootScene.id);
-      const ret = await engine.datasourceFactory.getDataSource()?.findTreeObjects({
-        modelName: 'scene',
-        fieldName: 'children',
-        rootObjectId: rootScene.id,
-      });
+      const ret = await engine.datasourceFactory
+        .getDataSource()
+        ?.findTreeObjects({
+          modelName: "scene",
+          fieldName: "children",
+          rootObjectId: rootScene.id,
+        });
       if (ret) {
         const newNodes: any[] = [];
         const newEdges: any[] = [];
@@ -135,12 +158,14 @@ export function SceneDesignHomeView() {
   useEffect(() => {}, [rootSceneId]);
 
   const onNodesChange = useCallback(
-    (changes: NodeChange<any>[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes]
+    (changes: NodeChange<any>[]) =>
+      setNodes(nds => applyNodeChanges(changes, nds)),
+    [setNodes],
   );
   const onEdgesChange = useCallback(
-    (changes: EdgeChange<any>[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges]
+    (changes: EdgeChange<any>[]) =>
+      setEdges(eds => applyEdgeChanges(changes, eds)),
+    [setEdges],
   );
 
   const handleSceneCreate = () => {
@@ -151,7 +176,7 @@ export function SceneDesignHomeView() {
     <Stack
       direction="row"
       spacing={1}
-      sx={{ p: 3, width: '100%', height: '100%' }}
+      sx={{ p: 3, width: "100%", height: "100%" }}
       alignContent="center"
       alignItems="center"
     >
@@ -177,9 +202,9 @@ export function SceneDesignHomeView() {
       <Box
         ref={containerRef}
         sx={{
-          width: '100%',
-          height: height ? `${height}px` : 'calc(100vh - 190px)',
-          position: 'relative',
+          width: "100%",
+          height: height ? `${height}px` : "calc(100vh - 190px)",
+          position: "relative",
         }}
       >
         {/* {state}/{JSON.stringify(data)}/{JSON.stringify(error)} */}
@@ -192,7 +217,7 @@ export function SceneDesignHomeView() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             fitViewOptions={{ padding: 2 }}
-            style={{ backgroundColor: 'background.default' }}
+            style={{ backgroundColor: "background.default" }}
           >
             {rootSceneId && (
               <MiniMap
@@ -203,12 +228,12 @@ export function SceneDesignHomeView() {
                 nodeColor="#999"
               />
             )}
-            <Controls style={{ backgroundColor: 'background.default' }} />
+            <Controls style={{ backgroundColor: "background.default" }} />
             <Background color="#999" variant={BackgroundVariant.Dots} />
 
             <Panel
               position="top-center"
-              style={{ height: '60%', backgroundColor: 'background.default' }}
+              style={{ height: "60%", backgroundColor: "background.default" }}
             >
               {!rootSceneId && renderRootSceneCreator()}
             </Panel>
@@ -216,7 +241,12 @@ export function SceneDesignHomeView() {
           </ReactFlow>
         </ReactFlowProvider>
       </Box>
-      <Dialog open={dialogOpen} fullWidth maxWidth="md" onClose={() => setDialogOpen(false)}>
+      <Dialog
+        open={dialogOpen}
+        fullWidth
+        maxWidth="md"
+        onClose={() => setDialogOpen(false)}
+      >
         <DialogTitle>创建主场景</DialogTitle>
 
         <DialogContent>
@@ -244,10 +274,10 @@ export function SceneDesignHomeView() {
             viewName="sceneFormViewNew"
             baseObjectId={createId()}
             reference={{
-              fromModelName: 'product',
-              fromFieldName: 'rootScene',
-              fromObjectId: currentAction?.contextObject?.id || '',
-              toModelName: 'scene',
+              fromModelName: "product",
+              fromFieldName: "rootScene",
+              fromObjectId: currentAction?.contextObject?.id || "",
+              toModelName: "scene",
             }}
             callbacks={{
               onObjectUpdated: onObjectChanged,
@@ -258,7 +288,11 @@ export function SceneDesignHomeView() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} variant="outlined" color="primary">
+          <Button
+            onClick={() => setDialogOpen(false)}
+            variant="outlined"
+            color="primary"
+          >
             关闭
           </Button>
         </DialogActions>
