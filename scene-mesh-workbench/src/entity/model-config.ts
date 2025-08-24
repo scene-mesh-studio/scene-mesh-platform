@@ -1,8 +1,8 @@
 import { SceneFlowEditorContainer } from "@/viewpoints/scene/views/editor";
+import FileUploadComp from "@/widgets/fileUploader/file-upload-comp";
 import type {
   IEntityView,
   IEntityModel,
-  IEntityViewMenuItem,
 } from "@scenemesh/entity-engine";
 
 import { z as zod } from "zod";
@@ -456,6 +456,30 @@ export const models: IEntityModel[] = [
         type: "one_to_many",
         refModel: "scene",
       },
+    ],
+  },
+  {
+    name: "content",
+    title: "内容",
+    description: "内容库",
+    fields: [
+      { name: "name", title: "文件名称", type: "string", isRequired: true },
+      { name: "description", title: "文件说明", type: "string", isRequired: false },
+      { name: "file", title: "文件", type: "binary", isRequired: true },
+      { name: "type", 
+        title: "文件类型", 
+        type: "enum", 
+        isRequired: true,
+        typeOptions: {
+          options: [
+            { value: "image", label: "图片" },
+            { value: "video", label: "视频" },
+            { value: "audio", label: "音频" },
+            { value: "document", label: "文档" },
+            { value: "other", label: "其他" },
+          ],
+        },
+      }
     ],
   },
 ];
@@ -950,6 +974,7 @@ export const views: IEntityView[] = [
           {
             name: "name",
             title: "基础配置",
+            icon: "ci:line-l",
             spanCols: 12,
             fields: [
               {
@@ -957,7 +982,7 @@ export const views: IEntityView[] = [
                 title: "产品信息",
                 width: 200,
                 widget: "action",
-                icon: "material-icon-theme:redux-action",
+                icon: "streamline-plump-color:information-circle",
                 widgetOptions: {
                   actionType: "view",
                   payload: { modelName: "product", viewType: "form" },
@@ -968,7 +993,7 @@ export const views: IEntityView[] = [
                 title: "通用配置",
                 width: 200,
                 widget: "action",
-                icon: "material-icon-theme:settings",
+                icon: "streamline-plump-color:mail-setting",
                 widgetOptions: {
                   actionType: "reference-view",
                   payload: {
@@ -983,12 +1008,13 @@ export const views: IEntityView[] = [
           {
             name: "event_action",
             title: "事件&动作",
+            icon: "ci:line-l",
             fields: [
               {
                 name: "events",
                 title: "事件配置",
                 spanCols: 12,
-                icon: "material-icon-theme:folder-git",
+                icon: "streamline-plump-color:mail-send-email-message",
                 widget: "action",
                 widgetOptions: {
                   actionType: "reference-view",
@@ -1003,7 +1029,7 @@ export const views: IEntityView[] = [
                 name: "actions",
                 title: "动作配置",
                 spanCols: 12,
-                icon: "material-icon-theme:folder-routes",
+                icon: "streamline-plump-color:end-point-branches",
                 widget: "action",
                 widgetOptions: {
                   actionType: "reference-view",
@@ -1019,12 +1045,13 @@ export const views: IEntityView[] = [
           {
             name: "scenes",
             title: "场景",
+            icon: "ci:line-l",
             fields: [
               {
                 name: "scenes",
                 title: "场景配置",
                 spanCols: 12,
-                icon: "material-icon-theme:webpack",
+                icon: "streamline-plump-color:align-selection",
                 widget: "action",
                 widgetOptions: {
                   actionType: "view",
@@ -1055,16 +1082,17 @@ export const views: IEntityView[] = [
           {
             name: "terminals",
             title: "终端",
+            icon: "ci:line-l",
             fields: [
               {
-                name: "events",
-                title: "连接配置",
+                name: "terminal-info",
+                title: "终端信息",
                 spanCols: 12,
-                icon: "material-icon-theme:folder-connection",
+                icon: "streamline-plump-color:browser-website-1",
                 widget: "action",
                 widgetOptions: {
-                  actionType: "view",
-                  payload: { modelName: "product", viewType: "grid" },
+                  actionType: "route",
+                  payload: { path: "/terminals/" },
                 },
               },
             ],
@@ -1072,12 +1100,13 @@ export const views: IEntityView[] = [
           {
             name: "llm",
             title: "AI",
+            icon: "ci:line-l",
             fields: [
               {
                 name: "events",
                 title: "工具模型",
                 spanCols: 12,
-                icon: "material-icon-theme:robots",
+                icon: "streamline-plump-color:module",
                 widget: "action",
                 widgetOptions: {
                   actionType: "view",
@@ -1216,7 +1245,12 @@ export const views: IEntityView[] = [
     viewType: "form",
     density: "medium",
     items: [
-      { name: "name", title: "产品名称", spanCols: 12 },
+      { name: "name",
+         title: "产品名称", 
+         spanCols: 12 ,
+        widget: "textfield",
+        widgetOptions: { multiline: true },
+      },
       {
         name: "category",
         title: "产品分类",
@@ -1261,11 +1295,10 @@ export const views: IEntityView[] = [
         title: "智能物联网平台",
         widget: "logo",
         widgetOptions: {
-          logoUrl: "https://lucide.dev/logo.light.svg",
-          icon: "mdi:apple-keyboard-command",
+          logoUrl: "/images/image.png",
+          icon: "clarity:internet-of-things-line",
           title: "智能物联网平台",
-          logoWidth: 30,
-          logoHeight: 30,
+          fixed: true,
         },
         spanCols: 12,
         flex: 1,
@@ -1284,11 +1317,12 @@ export const views: IEntityView[] = [
           {
             name: "overview-root",
             title: "概览",
+            icon: "ci:line-l",
             fields: [
               {
                 name: "product-overview",
                 title: "产品概览",
-                icon: "material-icon-theme:redux-action",
+                icon: "streamline-plump-color:align-object-left",
                 widget: "action",
                 widgetOptions: {
                   actionType: "route",
@@ -1298,7 +1332,7 @@ export const views: IEntityView[] = [
               {
                 name: "data-overview",
                 title: "数据概览",
-                icon: "material-icon-theme:database",
+                icon: "streamline-plump-color:arrow-expand",
                 widget: "action",
                 widgetOptions: {
                   actionType: "route",
@@ -1310,19 +1344,31 @@ export const views: IEntityView[] = [
           {
             name: "product-root",
             title: "产品",
+            icon: "ci:line-l",
             fields: [
               {
                 name: "product",
                 title: "产品管理",
-                icon: "material-icon-theme:pdm",
+                icon: "streamline-plump-color:production-belt",
                 fields: [
                   {
                     name: "product-grid",
                     title: "产品列表",
                     widget: "action",
+                    icon: "streamline-plump-color:align-right-flat",
                     widgetOptions: {
                       actionType: "view",
                       payload: { modelName: "product", viewType: "grid" },
+                    },
+                  },
+                  {
+                    name: 'product-new',
+                    title: '新建产品',
+                    widget: 'action',
+                    icon: "streamline-plump-color:add-layer-2",
+                    widgetOptions: {
+                      actionType: 'view',
+                      payload: { modelName: 'product', viewType: 'form', mode: 'create' },
                     },
                   },
                 ],
@@ -1332,53 +1378,58 @@ export const views: IEntityView[] = [
           {
             name: "resources-root",
             title: "资源",
+            icon: "ci:line-l",
             fields: [
               {
-                name: "repositoris",
+                name: "knowledge-base",
                 title: "知识库",
-                icon: "material-icon-theme:cbx",
+                icon: "streamline-plump-color:book-1",
                 fields: [
                   {
-                    name: "repositoris-grid",
+                    name: "knowledge-grid",
                     title: "知识库列表",
+                    icon: "streamline-plump-color:align-right-flat",
                     widget: "action",
                     widgetOptions: {
                       actionType: "view",
-                      payload: { modelName: "repositoris", viewType: "grid" },
+                      payload: { modelName: "knowledge", viewType: "grid" },
                     },
                   },
                   {
-                    name: "repositoris-new",
-                    title: "创建知识库",
+                    name: "knowledge-new",
+                    title: "新建知识库",
+                    icon: "streamline-plump-color:add-layer-2",
                     widget: "action",
                     widgetOptions: {
                       actionType: "view",
-                      payload: { modelName: "repositoris", viewType: "form" },
+                      payload: { modelName: "knowledge", viewType: "form" },
                     },
                   },
                 ],
               },
               {
-                name: "resources",
-                title: "资源库",
-                icon: "material-icon-theme:taskfile",
+                name: "contents",
+                title: "内容库",
+                icon: "streamline-plump-color:inbox-content",
                 fields: [
                   {
-                    name: "resource-grid",
-                    title: "资源库列表",
+                    name: "content-grid",
+                    title: "内容列表",
                     widget: "action",
+                    icon: "streamline-plump-color:align-right-flat",
                     widgetOptions: {
                       actionType: "view",
-                      payload: { modelName: "resource", viewType: "grid" },
+                      payload: { modelName: "content", viewType: "grid" },
                     },
                   },
                   {
-                    name: "resource-new",
-                    title: "创建资源",
+                    name: "content-new",
+                    title: "新建内容",
+                    icon: "streamline-plump-color:add-layer-2",
                     widget: "action",
                     widgetOptions: {
                       actionType: "view",
-                      payload: { modelName: "resource", viewType: "form" },
+                      payload: { modelName: "content", viewType: "form", mode: 'create' },
                     },
                   },
                 ],
@@ -1388,12 +1439,13 @@ export const views: IEntityView[] = [
           {
             name: "ai-root",
             title: "AI设置",
+            icon: "ci:line-l",
             fields: [
               {
                 name: "llmSetting",
                 title: "大模型设置",
                 spanCols: 12,
-                icon: "material-icon-theme:robots",
+                icon: "streamline-plump-color:module",
                 widget: "action",
                 widgetOptions: {
                   actionType: "view",
@@ -1406,8 +1458,8 @@ export const views: IEntityView[] = [
               {
                 name: "mcpSetting",
                 title: "MCP 设置",
+                icon: "streamline-plump-color:share-link",
                 spanCols: 12,
-                icon: "material-icon-theme:robots",
                 widget: "action",
                 widgetOptions: {
                   actionType: "view",
@@ -1439,162 +1491,47 @@ export const views: IEntityView[] = [
       },
     ],
   },
+  {
+    name: "contentGridView",
+    title: "内容列表",
+    modelName: "content",
+    viewType: "grid",
+    items: [
+      { name: "name", title: "标题", width: 100, flex: 0 },
+      { name: "description", title: "说明", width: 200, flex: 1 },
+      { name: "file", 
+        title: "文件",
+        widget: "custom",
+        width: 400, 
+        flex: 0,
+        widgetOptions: {
+          comp: FileUploadComp,
+        },
+      },
+      { name: "type", 
+        title: "类型",
+        width: 200, 
+        flex: 1
+      }
+    ],
+  },
+  {
+    name: "contentFormView",
+    title: "内容表单",
+    modelName: "content",
+    viewType: "form",
+    items: [
+      { name: "name", title: "标题", spanCols: 12, flex: 1 },
+      { name: "description", title: "说明", spanCols: 12, flex: 1 },
+      { name: "file", title: "文件",
+        widget: "custom",
+        spanCols: 4,
+        flex: 1,
+        widgetOptions: {
+          comp: FileUploadComp,
+        },
+      },
+      { name: "type", title: "类型", spanCols: 12, flex: 1 },
+    ],
+  }
 ];
-
-export const rootMenuItem: IEntityViewMenuItem = {
-  name: "root",
-  title: "根菜单",
-  items: [
-    {
-      name: "overview-root",
-      title: "概览",
-      items: [
-        {
-          name: "product-overview",
-          title: "产品概览",
-          icon: "material-icon-theme:redux-action",
-          action: { type: "route", payload: { path: "/dashboard/" } },
-        },
-        {
-          name: "data-overview",
-          title: "数据概览",
-          icon: "material-icon-theme:folder-database-open",
-          action: { type: "route", payload: { path: "/dashboard/ecommerce/" } },
-        },
-      ],
-    },
-    {
-      name: "product-root",
-      title: "产品",
-      items: [
-        {
-          name: "product",
-          title: "产品管理",
-          icon: "material-icon-theme:pdm",
-          items: [
-            {
-              name: "product-grid",
-              title: "产品列表",
-              action: {
-                type: "view",
-                payload: { modelName: "product", viewType: "grid" },
-              },
-            },
-            {
-              name: "product-new",
-              title: "创建产品",
-              action: {
-                type: "view",
-                payload: { modelName: "product", viewType: "form" },
-              },
-            },
-            { name: "product-demo", title: "示例产品" },
-          ],
-        },
-      ],
-    },
-    {
-      name: "resources-root",
-      title: "资源",
-      items: [
-        {
-          name: "repositoris",
-          title: "知识库",
-          icon: "material-icon-theme:cbx",
-          items: [
-            {
-              name: "repositoris-grid",
-              title: "知识库列表",
-              action: {
-                type: "view",
-                payload: { modelName: "repositoris", viewType: "grid" },
-              },
-            },
-            {
-              name: "repositoris-new",
-              title: "创建知识库",
-              action: {
-                type: "view",
-                payload: { modelName: "repositoris", viewType: "form" },
-              },
-            },
-          ],
-        },
-        {
-          name: "resources",
-          title: "资源库",
-          icon: "material-icon-theme:taskfile",
-          items: [
-            {
-              name: "resource-grid",
-              title: "资源库列表",
-              action: {
-                type: "view",
-                payload: { modelName: "resource", viewType: "grid" },
-              },
-            },
-            {
-              name: "resource-new",
-              title: "创建资源",
-              action: {
-                type: "view",
-                payload: { modelName: "resource", viewType: "form" },
-              },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      name: "data-root",
-      title: "数据",
-      items: [
-        {
-          name: "data-analysis",
-          title: "数据分析",
-          icon: "material-icon-theme:regedit",
-          action: { type: "route", payload: { path: "/data/analysis" } },
-        },
-        {
-          name: "terminal-analysis",
-          title: "终端分析",
-          icon: "material-icon-theme:cline",
-          action: { type: "route", payload: { path: "/terminal/analysis" } },
-        },
-        {
-          name: "user-analysis",
-          title: "用户分析",
-          icon: "material-icon-theme:java",
-          action: { type: "route", payload: { path: "/user/analysis" } },
-        },
-      ],
-    },
-    {
-      name: "settings-root",
-      title: "设置",
-      items: [
-        {
-          name: "settings",
-          title: "大模型设置",
-          icon: "material-icon-theme:robots",
-          action: {
-            type: "view",
-            payload: {
-              modelName: "languageModelProvider",
-              viewType: "mastail",
-            },
-          },
-        },
-        {
-          name: "settings",
-          title: "MCP设置",
-          icon: "material-icon-theme:robot",
-          action: {
-            type: "view",
-            payload: { modelName: "mcpService", viewType: "grid" },
-          },
-        },
-      ],
-    },
-  ],
-};

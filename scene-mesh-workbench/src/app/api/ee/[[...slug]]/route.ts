@@ -13,7 +13,7 @@ const handler = async (req: NextRequest) => {
   console.log("Entity Engine TRPC Handler: ", req.url);
 
   try {
-    const init = new EnginePrimitiveInitializer(models, views);
+    const init = new EnginePrimitiveInitializer({models, views});
 
     return fetchEntityEntranceHandler({
       request: req,
