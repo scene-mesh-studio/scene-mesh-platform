@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FoundationConfig {
 
-    @Value("${redis.connection.host}")
+    @Value("${sm.redis.host}")
     private String redisHost;
 
-    @Value("${redis.connection.port}")
+    @Value("${sm.redis.port}")
     private int redisPort;
 
     @Bean

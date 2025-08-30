@@ -5,8 +5,6 @@ import {
   fetchEntityEntranceHandler,
 } from "@scenemesh/entity-engine/server";
 
-// 使用动态导入来避免构建时的模块解析问题
-// export const runtime = 'nodejs';
 const rootPath = "/api/ee";
 
 const handler = async (req: NextRequest) => {

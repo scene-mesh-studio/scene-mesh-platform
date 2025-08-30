@@ -12,7 +12,6 @@ public class LanguageModelProvider {
     private String image; // type: 'binary' -> String (URL or path)
     private String apiMode; // type: 'enum' -> String
     private String apiHost;
-    private String apiPath;
     private String apiKey;
     private Boolean apiCompatibility;
     private List<LanguageModel> models; // type: 'one_to_many'

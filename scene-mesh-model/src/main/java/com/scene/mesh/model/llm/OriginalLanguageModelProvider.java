@@ -38,9 +38,6 @@ public class OriginalLanguageModelProvider {
         @JsonProperty("apiHost")
         private String apiHost;
 
-        @JsonProperty("apiPath")
-        private String apiPath;
-
         @JsonProperty("apiMode")
         private String apiMode;
 
@@ -106,5 +103,11 @@ public class OriginalLanguageModelProvider {
 
         @JsonProperty("description")
         private String description;
+
+        @JsonProperty("modelPath")
+        private String modelPath;
+
+        @JsonProperty("dimensions")
+        private int dimensions;
     }
 }

@@ -218,7 +218,6 @@ public class MutableCacheService {
             String providerName = originalLmp.getValues().getName();
             String providerDes = originalLmp.getValues().getDescription();
             String apiHost = originalLmp.getValues().getApiHost();
-            String apiPath = originalLmp.getValues().getApiPath();
             String apiKey = originalLmp.getValues().getApiKey();
             String apiMode = originalLmp.getValues().getApiMode();
             boolean isApiCompatibility = originalLmp.getValues().isApiCompatibility();
@@ -228,7 +227,6 @@ public class MutableCacheService {
             lmp.setName(providerName);
             lmp.setDescription(providerDes);
             lmp.setApiHost(apiHost);
-            lmp.setApiPath(apiPath);
             lmp.setApiKey(apiKey);
             lmp.setApiCompatibility(isApiCompatibility);
             lmp.setApiMode(apiMode);
@@ -240,6 +238,8 @@ public class MutableCacheService {
                     String modelId = originalLm.getId();
                     String modelName = originalLm.getValues().getName();
                     String modelDes = originalLm.getValues().getDescription();
+                    String modelPath = originalLm.getValues().getModelPath();
+                    int dimensions = originalLm.getValues().getDimensions();
                     List<String> features = originalLm.getValues().getFeature();
 
                     LanguageModel llm = new LanguageModel();
@@ -247,6 +247,9 @@ public class MutableCacheService {
                     llm.setName(modelName);
                     llm.setDescription(modelDes);
                     llm.setFeature(features);
+                    llm.setModelPath(modelPath);
+                    llm.setDimensions(dimensions);
+
 
                     llms.add(llm);
                 }
@@ -259,7 +262,7 @@ public class MutableCacheService {
 
     private List<OriginalProduct> getAllOriginalProducts() {
         Map<String, String> params = new HashMap<>();
-        params.put("withReference", "true");
+//        params.put("withReference", "true");
         Object responseObj = this.apiClient.get(ApiClient.ServiceType.product.name(), "", Object.class, params);
         if (responseObj == null) {
             throw new RuntimeException("invoke product list api,but not found any object.");

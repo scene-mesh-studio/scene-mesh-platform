@@ -13,15 +13,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ServiceConfig {
 
-    @Value("${redis.connection.host}")
+    @Value("${sm.redis.host}")
     private String redisHost;
 
-    @Value("${redis.connection.port}")
-    private String redisPort;
+    @Value("${sm.redis.port}")
+    private int redisPort;
 
     @Bean
     public RedisCache iCache() {
-        return new RedisCache(redisHost, Integer.parseInt(redisPort));
+        return new RedisCache(redisHost, redisPort);
     }
 
     @Bean

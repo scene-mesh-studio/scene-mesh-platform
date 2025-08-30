@@ -50,11 +50,11 @@ import java.util.*;
  * buffer.
  *
  * <p>The idea of the implementation is to have a buffer for incoming events with unique ids
- * assigned to them. This way we do not need to deserialize events during processing and we store
+ * assigned to them. This way we do not need to deserialize events during processing and we factory
  * only one copy of the event.
  *
  * <p>The entries in {@link SharedBuffer} are {@link SharedBufferNode}. The shared buffer node
- * allows to store relations between different entries. A dewey versioning scheme allows to
+ * allows to factory relations between different entries. A dewey versioning scheme allows to
  * discriminate between different relations (e.g. preceding element).
  *
  * <p>The implementation is strongly based on the paper "Efficient Pattern Matching over Event

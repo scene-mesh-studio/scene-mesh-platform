@@ -1,5 +1,3 @@
-import { SceneFlowEditorContainer } from "@/viewpoints/scene/views/editor";
-import FileUploadComp from "@/widgets/fileUploader/file-upload-comp";
 import type {
   IEntityView,
   IEntityModel,
@@ -243,20 +241,20 @@ export const models: IEntityModel[] = [
     ],
   },
   {
-    name: "languageModelProvider",
+    name: "intelligentModelProvider",
     title: "模型供应商",
-    description: "大语言模型供应商",
+    description: "模型供应商",
     fields: [
       { name: "name", title: "供应商名称", type: "string", isRequired: true },
       {
         name: "description",
-        title: "语言模型说明",
+        title: "供应商说明",
         type: "string",
         isRequired: true,
       },
       {
         name: "image",
-        title: "语言模型图片",
+        title: "供应商图片",
         type: "binary",
         isRequired: true,
       },
@@ -278,24 +276,17 @@ export const models: IEntityModel[] = [
       },
       { name: "apiKey", title: "API密钥", type: "string", isRequired: true },
       {
-        name: "apiCompatibility",
-        title: "API兼容",
-        type: "boolean",
-        defaultValue: false,
-        isRequired: true,
-      },
-      {
         name: "models",
-        title: "大语言模型",
+        title: "模型",
         type: "one_to_many",
-        refModel: "languageModel",
+        refModel: "intelligentModel",
       },
     ],
   },
   {
-    name: "languageModel",
-    title: "大语言模型",
-    description: "大语言模型",
+    name: "intelligentModel",
+    title: "模型",
+    description: "模型",
     fields: [
       {
         name: "name",
@@ -309,6 +300,19 @@ export const models: IEntityModel[] = [
         title: "模型说明",
         type: "string",
         isRequired: false,
+      },
+      {
+        name: "modelPath",
+        title: "模型路径",
+        type: "string",
+        isRequired: true,
+      },
+      {
+        name: "dimensions",
+        title: "向量维度数",
+        type: "number",
+        isRequired: false,
+        defaultValue: 0,
       },
       {
         name: "feature",
@@ -466,9 +470,10 @@ export const models: IEntityModel[] = [
       { name: "name", title: "文件名称", type: "string", isRequired: true },
       { name: "description", title: "文件说明", type: "string", isRequired: false },
       { name: "file", title: "文件", type: "binary", isRequired: true },
-      { name: "type", 
-        title: "文件类型", 
-        type: "enum", 
+      {
+        name: "type",
+        title: "文件类型",
+        type: "enum",
         isRequired: true,
         typeOptions: {
           options: [
@@ -482,6 +487,91 @@ export const models: IEntityModel[] = [
       }
     ],
   },
+  {
+    name: "knowledgeBase",
+    title: "知识库",
+    description: "知识库",
+    fields: [
+      { name: "name", title: "知识库名称", type: "string", isRequired: true },
+      { name: "description", title: "知识库说明", type: "string", isRequired: false },
+      { name: "knowledgeItems", title: " 知识项", type: "one_to_many", refModel: "knowledgeItem" },
+      {
+        name: "provider",
+        title: "供应商名称",
+        type: "many_to_one",
+        refModel: "intelligentModelProvider",
+        isRequired: true,
+      },
+      {
+        name: "embeddingsModel",
+        title: "向量模型",
+        type: "many_to_one",
+        refModel: "intelligentModel",
+        isRequired: true
+      },
+      { name: "enable", title: "是否启用", type: "boolean", isRequired: true, defaultValue: true },
+    ],
+  },
+  {
+    name: "knowledgeItem",
+    title: "知识库内容项",
+    description: "知识库内容项",
+    fields: [
+      { name: "content", title: "所选内容", type: "one_to_one", refModel: "content", isRequired: true },
+      { name: "chunks", title: "内容分块", type: "one_to_many", refModel: "chunk", isRequired: false },
+      {
+        name: "vectorizationStrategy",
+        title: "向量化策略",
+        type: "many_to_one",
+        refModel: "vectorizationStrategy",
+        isRequired: true
+      },
+    ],
+  },
+  {
+    name: "chunk",
+    title: "内容分块",
+    description: "内容分块",
+    fields: [
+      { name: "data", title: "分块数据", type: "string", isRequired: true },
+    ],
+  },
+  {
+    name: "vectorizationStrategy",
+    title: "向量化策略",
+    description: "向量化策略",
+    fields: [
+      { name: "name", title: "名称", type: "string", isRequired: true },
+      {
+        name: "chunkSize",
+        title: "分块大小(tokens)",
+        type: "number",
+        isRequired: false,
+        defaultValue: 800,
+      },
+      {
+        name: "minChunkSizeChars",
+        title: "分块最小字符数(char)",
+        type: "number",
+        isRequired: false,
+        defaultValue: 350,
+      },
+      {
+        name: "minChunkLengthToEmbed",
+        title: "最小丢弃长度(char)",
+        type: "number",
+        isRequired: false,
+        defaultValue: 5,
+      },
+      {
+        name: "maxNumChunks",
+        title: "最大分块数量(char)",
+        type: "number",
+        isRequired: false,
+        defaultValue: 10000,
+      }
+    ],
+  }
 ];
 
 export const views: IEntityView[] = [
@@ -607,7 +697,7 @@ export const views: IEntityView[] = [
                 widgetOptions: {
                   actionType: "comp",
                   payload: {
-                    comp: SceneFlowEditorContainer,
+                    comp: 'SceneFlowEditorContainer',
                   },
                 },
               },
@@ -657,9 +747,9 @@ export const views: IEntityView[] = [
     ],
   },
   {
-    name: "languageModelProviderGridView",
+    name: "intelligentModelProviderGridView",
     title: "模型供应商列表",
-    modelName: "languageModelProvider",
+    modelName: "intelligentModelProvider",
     description: "模型供应商",
     viewType: "grid",
     viewOptions: {},
@@ -676,7 +766,6 @@ export const views: IEntityView[] = [
       },
       { name: "apiMode", title: "API模式", spanCols: 12 },
       { name: "apiHost", title: "API主机", spanCols: 12 },
-      { name: "apiCompatibility", title: "API兼容", spanCols: 12 },
       {
         name: "models",
         title: "模型列表",
@@ -688,9 +777,9 @@ export const views: IEntityView[] = [
     ],
   },
   {
-    name: "languageModelProviderFormView",
+    name: "intelligentModelProviderFormView",
     title: "模型供应商",
-    modelName: "languageModelProvider",
+    modelName: "intelligentModelProvider",
     description: "模型供应商",
     viewType: "form",
     density: "medium",
@@ -713,10 +802,9 @@ export const views: IEntityView[] = [
       { name: "apiHost", title: "API主机", spanCols: 6 },
       { name: "apiKey", title: "API密钥", widget: "password", spanCols: 6 },
       { name: "apiMode", title: "API模式", spanCols: 6 },
-      { name: "apiCompatibility", title: "API兼容", spanCols: 6 },
       {
         name: "models",
-        title: "大语言模型",
+        title: "模型",
         widget: "references",
         width: 120,
         spanCols: 12,
@@ -724,23 +812,24 @@ export const views: IEntityView[] = [
     ],
   },
   {
-    name: "languageModelGridView",
-    title: "大语言模型列表",
-    modelName: "languageModel",
-    description: "大语言模型",
+    name: "intelligentModelGridView",
+    title: "模型列表",
+    modelName: "intelligentModel",
+    description: "模型列表",
     viewType: "grid",
     viewOptions: {},
     items: [
       { name: "name", title: "模型名称", spanCols: 12, flex: 1 },
       { name: "description", title: "模型说明", spanCols: 12, flex: 1 },
+      { name: "modelPath", title: "模型路径", spanCols: 12, flex: 1 },
       { name: "feature", title: "模型特性", spanCols: 12, flex: 1 },
     ],
   },
   {
-    name: "languageModelFormView",
-    title: "大语言模型",
-    modelName: "languageModel",
-    description: "大语言模型",
+    name: "intelligentModelFormView",
+    title: "模型表单",
+    modelName: "intelligentModel",
+    description: "模型表单",
     viewType: "form",
     density: "medium",
     items: [
@@ -750,6 +839,18 @@ export const views: IEntityView[] = [
         title: "模型说明",
         widget: "textfield",
         widgetOptions: { multiline: true },
+        spanCols: 12,
+      },
+      {
+        name: "modelPath",
+        title: "模型路径",
+        widget: "textfield",
+        spanCols: 12,
+      },
+      {
+        name: "dimensions",
+        title: "向量维度数",
+        widget: "number",
         spanCols: 12,
       },
       { name: "feature", title: "模型特性", spanCols: 12 },
@@ -1103,7 +1204,7 @@ export const views: IEntityView[] = [
             icon: "ci:line-l",
             fields: [
               {
-                name: "events",
+                name: "tools",
                 title: "工具模型",
                 spanCols: 12,
                 icon: "streamline-plump-color:module",
@@ -1132,9 +1233,9 @@ export const views: IEntityView[] = [
     ],
   },
   {
-    name: "llmSettingHomeView",
+    name: "impSettingHomeView",
     title: "AI设置",
-    modelName: "languageModelProvider",
+    modelName: "intelligentModelProvider",
     description: "AI设置",
     viewType: "mastail",
     viewOptions: {},
@@ -1170,8 +1271,9 @@ export const views: IEntityView[] = [
                 widgetOptions: {
                   actionType: "view",
                   payload: {
-                    modelName: "languageModelProvider",
+                    modelName: "intelligentModelProvider",
                     viewType: "form",
+                    mode: "edit",
                   },
                 },
               },
@@ -1245,9 +1347,10 @@ export const views: IEntityView[] = [
     viewType: "form",
     density: "medium",
     items: [
-      { name: "name",
-         title: "产品名称", 
-         spanCols: 12 ,
+      {
+        name: "name",
+        title: "产品名称",
+        spanCols: 12,
         widget: "textfield",
         widgetOptions: { multiline: true },
       },
@@ -1392,7 +1495,7 @@ export const views: IEntityView[] = [
                     widget: "action",
                     widgetOptions: {
                       actionType: "view",
-                      payload: { modelName: "knowledge", viewType: "grid" },
+                      payload: { modelName: "knowledgeBase", viewType: "grid" },
                     },
                   },
                   {
@@ -1402,7 +1505,17 @@ export const views: IEntityView[] = [
                     widget: "action",
                     widgetOptions: {
                       actionType: "view",
-                      payload: { modelName: "knowledge", viewType: "form" },
+                      payload: { modelName: "knowledgeBase", viewType: "form", mode: 'create' },
+                    },
+                  },
+                  {
+                    name: "vectorization-strategy",
+                    title: "向量化策略",
+                    icon: "streamline-plump-color:mail-setting",
+                    widget: "action",
+                    widgetOptions: {
+                      actionType: "view",
+                      payload: { modelName: "vectorizationStrategy", viewType: "grid" },
                     },
                   },
                 ],
@@ -1442,15 +1555,15 @@ export const views: IEntityView[] = [
             icon: "ci:line-l",
             fields: [
               {
-                name: "llmSetting",
-                title: "大模型设置",
+                name: "imSetting",
+                title: "智能模型设置",
                 spanCols: 12,
                 icon: "streamline-plump-color:module",
                 widget: "action",
                 widgetOptions: {
                   actionType: "view",
                   payload: {
-                    modelName: "languageModelProvider",
+                    modelName: "intelligentModelProvider",
                     viewType: "mastail",
                   },
                 },
@@ -1499,18 +1612,20 @@ export const views: IEntityView[] = [
     items: [
       { name: "name", title: "标题", width: 100, flex: 0 },
       { name: "description", title: "说明", width: 200, flex: 1 },
-      { name: "file", 
+      {
+        name: "file",
         title: "文件",
         widget: "custom",
-        width: 400, 
+        width: 400,
         flex: 0,
         widgetOptions: {
-          comp: FileUploadComp,
+          comp: 'FileUploadCompWrapper',
         },
       },
-      { name: "type", 
+      {
+        name: "type",
         title: "类型",
-        width: 200, 
+        width: 200,
         flex: 1
       }
     ],
@@ -1523,15 +1638,197 @@ export const views: IEntityView[] = [
     items: [
       { name: "name", title: "标题", spanCols: 12, flex: 1 },
       { name: "description", title: "说明", spanCols: 12, flex: 1 },
-      { name: "file", title: "文件",
+      {
+        name: "file", title: "文件",
         widget: "custom",
         spanCols: 4,
         flex: 1,
         widgetOptions: {
-          comp: FileUploadComp,
+          comp: 'FileUploadComp',
         },
       },
       { name: "type", title: "类型", spanCols: 12, flex: 1 },
+    ],
+  },
+  // {
+  //   name: "content",
+  //   title: "内容",
+  //   description: "内容库",
+  //   fields: [
+  //     { name: "name", title: "文件名称", type: "string", isRequired: true },
+  //     { name: "description", title: "文件说明", type: "string", isRequired: false },
+  //     { name: "file", title: "文件", type: "binary", isRequired: true },
+  //     {
+  //       name: "type",
+  //       title: "文件类型",
+  //       type: "enum",
+  //       isRequired: true,
+  //       typeOptions: {
+  //         options: [
+  //           { value: "image", label: "图片" },
+  //           { value: "video", label: "视频" },
+  //           { value: "audio", label: "音频" },
+  //           { value: "document", label: "文档" },
+  //           { value: "other", label: "其他" },
+  //         ],
+  //       },
+  //     }
+  //   ],
+  // },
+  // {
+  //   name: "knowledgeBase",
+  //   title: "知识库",
+  //   description: "知识库",
+  //   fields: [
+  //     { name: "name", title: "知识库名称", type: "string", isRequired: true },
+  //     { name: "description", title: "知识库说明", type: "string", isRequired: false },
+  //     { name: "knowledgeItems", title: " 知识项", type: "one_to_many", refModel: "knowledgeItem" },
+  //     { name: "enable", title: "是否启用", type: "boolean", isRequired: true, defaultValue: true },
+  //   ],
+  // },
+  // {
+  //   name: "knowledgeItem",
+  //   title: "知识库内容项",
+  //   description: "知识库内容项",
+  //   fields: [
+  //     { name: "content", title: "所选内容", type: "one_to_one", refModel: "content", isRequired: true },
+  //     { name: "chunks", title: "内容分块", type: "one_to_many", refModel: "chunk", isRequired: false },
+  //     { name: "vectorizationStrategy", 
+  //       title: "分块设置", 
+  //       type: "one_to_one", 
+  //       refModel: "vectorizationStrategy", 
+  //       isRequired: true },
+  //   ],
+  // },
+  // {
+  //   name: "chunk",
+  //   title: "内容分块",
+  //   description: "内容分块",
+  //   fields: [
+  //     { name: "data", title: "分块数据", type: "string", isRequired: true },
+  //   ],
+  // },
+  // {
+  //   name: "vectorizationStrategy",
+  //   title: "向量化策略",
+  //   description: "向量化策略",
+  //   fields: [
+  //     {
+  //       name: "chunkingStrategy",
+  //       title: "分块策略",
+  //       type: "enum",
+  //       isRequired: true,
+  //       typeOptions: {
+  //         options: [
+  //           { value: "by_sentence", label: "按句子" },
+  //           { value: "by_paragraph", label: "按段落" },
+  //           { value: "by_custom", label: "自定义" },
+  //         ],
+  //       },
+  //     },
+  //     { name: "rule", title: "自定义分隔符", type: "string", isRequired: false },
+  //     { name: "embeddingsModel", title: "向量模型", type: "one_to_one", refModel: "intelligentModel", isRequired: true },
+  //   ],
+  // }
+  {
+    name: "knowledgeBaseGrid",
+    title: "知识库列表",
+    modelName: "knowledgeBase",
+    viewType: "grid",
+    items: [
+      { name: "name", title: "知识库名称", width: 100, flex: 0 },
+      { name: "description", title: "知识库说明", width: 200, flex: 1 },
+      { name: "provider", title: "供应商名称", width: 100, flex: 0 },
+      { name: "embeddingsModel", title: "向量模型", width: 100, flex: 0 },
+      { name: "enable", title: "是否启用", width: 100, flex: 0 },
+      {
+        name: "knowledgeItems",
+        title: "查看知识项",
+        widget: "action",
+        // icon: "material-icon-theme:settings",
+        widgetOptions: {
+          actionType: "view",
+          payload: { modelName: "knowledgeItem", viewType: "grid" },
+        },
+      },
+    ],
+  },
+  {
+    name: "knowledgeBaseForm",
+    title: "知识库表单",
+    modelName: "knowledgeBase",
+    viewType: "form",
+    items: [
+      { name: "name", title: "知识库名称", spanCols: 12, flex: 1 },
+      { name: "description", title: "知识库说明", spanCols: 12, flex: 1 },
+      { name: "provider", title: "供应商名称", spanCols: 12, flex: 1 },
+      { name: "embeddingsModel", title: "向量模型", spanCols: 12, flex: 1 },
+      { name: "enable", title: "是否启用", spanCols: 12, flex: 1 },
+    ],
+  },
+  {
+    name: "knowledgeItemGrid",
+    title: "知识项列表",
+    modelName: "knowledgeItem",
+    viewType: "grid",
+    items: [
+      { name: "content", title: "所选内容", width: 100, flex: 1 },
+      { name: "chunks", title: "内容分块", width: 100, flex: 1 },
+      {
+        name: "vectorizationStrategy",
+        title: "向量化策略",
+        width: 100,
+        flex: 1,
+      },
+      {
+        name: "process",
+        title: "向量化详情",
+        flex: 1,
+        width: 50,
+        widget: "action",
+        widgetOptions: {
+          actionType: "comp",
+          payload: {
+            comp: 'VectorizationTaskView',
+          },
+        },
+      }
+    ],
+  },
+  {
+    name: "knowledgeItemForm",
+    title: "内容项表单",
+    modelName: "knowledgeItem",
+    viewType: "form",
+    items: [
+      { name: "content", title: "所选内容", spanCols: 12, flex: 1 },
+      { name: "vectorizationStrategy", title: "向量化策略", spanCols: 12, flex: 1 },
+    ],
+  },
+  {
+    name: "vectorizationStrategyGrid",
+    title: "向量化策略列表",
+    modelName: "vectorizationStrategy",
+    viewType: "grid",
+    items: [
+      { name: "name", title: "名称", width: 100, flex: 0 },
+      { name: "chunkSize", title: "分块大小(tokens)", width: 100, flex: 1 },
+      { name: "minChunkSizeChars", title: "分块最小字符数(char)", width: 100, flex: 1 },
+      { name: "minChunkLengthToEmbed", title: "最小丢弃长度(char)", width: 100, flex: 1 },
+      { name: "maxNumChunks", title: "最大分块数量(char)", width: 100, flex: 1 },
+    ],
+  },
+  {
+    name: "vectorizationStrategyForm",
+    title: "向量化策略表单",
+    modelName: "vectorizationStrategy",
+    viewType: "form",
+    items: [
+      { name: "name", title: "名称", spanCols: 12, flex: 1 },
+      { name: "chunkSize", title: "分块大小(tokens)", spanCols: 6, flex: 1 },
+      { name: "minChunkSizeChars", title: "分块最小字符数(char)", spanCols: 6, flex: 1 },
+      { name: "minChunkLengthToEmbed", title: "最小丢弃长度(char)", spanCols: 6, flex: 1 },
+      { name: "maxNumChunks", title: "最大分块数量(char)", spanCols: 6, flex: 1 },
     ],
   }
 ];

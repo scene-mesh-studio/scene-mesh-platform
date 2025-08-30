@@ -7,12 +7,12 @@ import com.scene.mesh.model.event.Event;
 import com.scene.mesh.model.event.IMetaEvent;
 import com.scene.mesh.model.scene.Scene;
 import com.scene.mesh.model.scene.WhenThen;
-import com.scene.mesh.service.spec.ai.IAgentService;
-import com.scene.mesh.service.spec.ai.IChatClientFactory;
-import com.scene.mesh.service.impl.ai.DefaultAgentService;
-import com.scene.mesh.service.impl.ai.DefaultChatClientFactory;
-import com.scene.mesh.service.spec.ai.ILLmConfigService;
-import com.scene.mesh.service.spec.ai.IToolsService;
+import com.scene.mesh.service.spec.ai.chat.IAgentService;
+import com.scene.mesh.service.spec.ai.chat.IChatClientFactory;
+import com.scene.mesh.service.impl.ai.chat.DefaultAgentService;
+import com.scene.mesh.service.impl.ai.chat.DefaultChatClientFactory;
+import com.scene.mesh.service.spec.ai.config.ILLmConfigService;
+import com.scene.mesh.service.spec.ai.mcp.IToolsService;
 import com.scene.mesh.service.spec.event.IMetaEventService;
 import org.apache.commons.lang3.SerializationUtils;
 

@@ -25,7 +25,7 @@
     "@mantine/notifications": "8.2.5",
     "@mui/icons-material": "^7.3.1",
     "@mui/material": "^7.1.2",
-    "@scenemesh/entity-engine": "^0.1.55",
+    "@scenemesh/entity-engine": "^0.1.68",
     "@types/dagre": "^0.7.52",
     "@xyflow/react": "^12.6.4",
     "dagre": "^0.8.5",
@@ -55,5 +55,7 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "main": "index.js",
+  "license": "MIT"
 }

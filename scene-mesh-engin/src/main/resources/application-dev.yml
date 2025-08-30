@@ -24,7 +24,7 @@ scene-mesh:
         api-key: 58245a200b71437bbece2b85c71c844a.uJKQJvMhutDrPQPE
     mcp:
       server:
-        url: http://localhost:9001
+        url: http://localhost:9002
 
   # 消息类配置
   message-classes:
@@ -34,6 +34,6 @@ scene-mesh:
   # api client
   api-client:
     urls:
-      product: http://localhost:8082/api/entities/objects/product/?withReference=true
-      llm: http://localhost:8082/api/entities/objects/languageModelProvider/?withReference=true
-      mcpserver: http://localhost:8082/api/entities/objects/mcpService/?withReference=true
+      product: http://localhost:3000/api/ee/services/objects/product?withReference=true
+      llm: http://localhost:3000/api/ee/services/objects/intelligentModelProvider?withReference=true
+      mcpserver: http://localhost:3000/api/ee/services/objects/mcpService?withReference=true

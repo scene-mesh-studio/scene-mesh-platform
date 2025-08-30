@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { EntityEngineProviderWrapper } from "../entity/provider/entity-engine-provider-warpper";
 import { Notifications } from "@mantine/notifications";
-import { url } from 'inspector';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

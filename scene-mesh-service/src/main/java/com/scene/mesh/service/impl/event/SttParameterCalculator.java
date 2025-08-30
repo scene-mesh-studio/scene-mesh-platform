@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Component
 public class SttParameterCalculator extends BaseParameterCalculator {
 
     private final ISpeechService speechService;

@@ -23,7 +23,7 @@ public class ApiClient {
 
     public void __init__(){
         RequestConfig config = RequestConfig.custom()
-                .setRedirectsEnabled(true)
+                .setRedirectsEnabled(false)
                 .setCircularRedirectsAllowed(false)
                 .build();
 
@@ -50,6 +50,10 @@ public class ApiClient {
         String url = serviceUrls.get(service) + path;
         HttpEntity<Object> entity = new HttpEntity<>(request);
         return restTemplate.exchange(url, HttpMethod.PUT, entity, responseType).getBody();
+    }
+
+    public <T> T customPost(String url, Object request, Class<T> responseType) {
+        return restTemplate.postForObject(url, request, responseType);
     }
 
     public void delete(String service, String path, Object... params) {

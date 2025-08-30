@@ -2,22 +2,22 @@ spring:
   application:
     name: scene-mesh-manager
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
+    url: jdbc:postgresql://localhost:5432/compute
+    username: sm
     password: scene_mesh
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10          # ???????
-      minimum-idle: 2               # ????????
-      connection-timeout: 20000      # ????????
-      idle-timeout: 300000          # ??????(5??)
-      max-lifetime: 1200000         # ????????(20??)
-      leak-detection-threshold: 60000 # ????????
-      keepalive-time: 30000         # ??????
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      leak-detection-threshold: 60000
+      keepalive-time: 30000
   jpa:
     hibernate:
-      ddl-auto: update  # ?????update??????none/validate
-    show-sql: true      # ?????SQL???????false
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -26,6 +26,19 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+sm:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  vector:
+    store:
+      url: jdbc:postgresql://localhost:5432/compute
+      username: sm
+      password: scene_mesh
+
+server:
+  port: 9001
+
 logging:
   level:
     root: INFO

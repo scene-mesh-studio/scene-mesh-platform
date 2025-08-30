@@ -10,6 +10,9 @@ import {
 import { views, models } from "../model-config";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { hasPermission, isAuthenticated, getCurrentUser } from "../auth/auth-utils";
+import { SceneFlowEditorContainer } from "@/viewpoints/scene/views/editor";
+import { FileUploadCompWrapper } from "@/widgets/uploader";
+import { VectorizationTaskView } from "@/viewpoints/vector";
 
 type EntityEngineProviderWrapperProps = {
   children: React.ReactNode;
@@ -21,8 +24,10 @@ export function EntityEngineProviderWrapper(
   const router = useRouter();
 
   const EntityEngineProvider = createEntityEngineProvider({
-    models,
-    views,
+    config:{
+      models,
+      views
+    },
     suiteAdapters: [],
     suiteAdapter: { suiteName: "build-in", suiteVersion: "1.0.0" },
     router: {
@@ -75,32 +80,40 @@ export function EntityEngineProviderWrapper(
       },
     },
     renderers: [
-      {
-        name: 'shell-settings',
-        slotName: 'shell-settings-item',
-        renderer: (_p: unknown) => {
+      // {
+      //   name: 'shell-settings',
+      //   slotName: 'shell-settings-item',
+      //   renderer: (_p: unknown) => {
   
-          return (
-          <div>
-            Settings Component
-          </div>
-          );
-        },
-      },
-      {
-        name: 'view-tool-2',
-        slotName: 'view-tool',
-        renderer: (p: any) => <div>测试{p.model.name}</div>,
-      },
+      //     return (
+      //     <div>
+      //       Settings Component
+      //     </div>
+      //     );
+      //   },
+      // },
       {
         ...EntityViewInspector,
       },
+      {
+        name:'SceneFlowEditorContainer',
+        renderer:(p:any)=><SceneFlowEditorContainer {...p}/>
+      },
+      {
+        name:'FileUploadComp',
+        renderer: (p:any)=><FileUploadCompWrapper {...p}/>
+      },
+      {
+        name:'VectorizationTaskView',
+        renderer: (p:any)=><VectorizationTaskView {...p}/>
+      }
     ],
     // Note: customActionHandlers may need to be implemented differently based on entity-engine version
     // For now, we'll handle logout through the permission guard system
-    serverInfo: {
+    settings: {
       baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000",
       endpoint: process.env.NEXT_PUBLIC_API_ENDPOINT || "/api/ee",
+      authenticationEnabled: true,
     },
   });
 

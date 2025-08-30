@@ -10,4 +10,6 @@ public class LanguageModel {
     private String name;
     private String description;
     private List<String> feature; // type: 'array' of enum -> List<String>
+    private String modelPath;
+    private int dimensions;
 }
