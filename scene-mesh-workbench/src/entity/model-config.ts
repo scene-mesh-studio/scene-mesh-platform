@@ -494,7 +494,7 @@ export const models: IEntityModel[] = [
     fields: [
       { name: "name", title: "知识库名称", type: "string", isRequired: true },
       { name: "description", title: "知识库说明", type: "string", isRequired: false },
-      { name: "knowledgeItems", title: " 知识项", type: "one_to_many", refModel: "knowledgeItem" },
+      { name: "knowledgeItems", title: "知识项", type: "one_to_many", refModel: "knowledgeItem" },
       {
         name: "provider",
         title: "供应商名称",
@@ -1742,13 +1742,16 @@ export const views: IEntityView[] = [
       { name: "embeddingsModel", title: "向量模型", width: 100, flex: 0 },
       { name: "enable", title: "是否启用", width: 100, flex: 0 },
       {
-        name: "knowledgeItems",
+        name: "knowledgeItemsAction",
         title: "查看知识项",
         widget: "action",
-        // icon: "material-icon-theme:settings",
         widgetOptions: {
-          actionType: "view",
-          payload: { modelName: "knowledgeItem", viewType: "grid" },
+          actionType: "reference-view",
+          payload: {
+            fromFieldName: "knowledgeItems",
+            toModelName: "knowledgeItem",
+            viewType: "grid" 
+          },
         },
       },
     ],

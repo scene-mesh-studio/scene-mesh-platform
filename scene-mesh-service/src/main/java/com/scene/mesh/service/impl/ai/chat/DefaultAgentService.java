@@ -2,12 +2,14 @@ package com.scene.mesh.service.impl.ai.chat;
 
 import com.scene.mesh.model.event.Event;
 import com.scene.mesh.model.scene.WhenThen;
+import com.scene.mesh.service.spec.ai.advisor.IAdvisorFactory;
 import com.scene.mesh.service.spec.ai.chat.IAgentService;
 import com.scene.mesh.service.spec.ai.chat.IChatClientFactory;
 import com.scene.mesh.service.spec.ai.chat.IPromptService;
 import com.scene.mesh.service.spec.ai.mcp.IToolsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -25,14 +27,17 @@ public class DefaultAgentService implements IAgentService {
 
     private final IChatClientFactory chatClientFactory;
 
+    private final IAdvisorFactory advisorFactory;
+
     private final IPromptService promptService;
 
     private final IToolsService toolsService;
 
     private final Resource templateResource = new ClassPathResource("user_prompt_template.av");
 
-    public DefaultAgentService(IChatClientFactory chatClientFactory,IToolsService toolsService) {
+    public DefaultAgentService(IChatClientFactory chatClientFactory, IAdvisorFactory advisorFactory, IToolsService toolsService) {
         this.chatClientFactory = chatClientFactory;
+        this.advisorFactory = advisorFactory;
         this.toolsService = toolsService;
         this.promptService = new AviatorPromptService();
     }
@@ -46,6 +51,7 @@ public class DefaultAgentService implements IAgentService {
         String scenePrompt = then.getPromptTemplate();
         Double temperature = then.getTemperature();
         Integer topP = then.getTopP();
+        WhenThen.KnowledgeBase[] kbs = then.getKnowledgeBases();//TODO kbs process
 
         // needful action ids
         List<String> actionIds = new ArrayList<>();
@@ -62,6 +68,9 @@ public class DefaultAgentService implements IAgentService {
                 "events", inputEvents,
                 "terminalId", inputEvents.get(0).getTerminalId()
         );
+
+        // needful advisor
+//        Advisor advisor = this.advisorFactory.getAdvisors();
 
         String userMessage = this.promptService.assembleUserMessage(templateResource, variables);
         Prompt prompt = Prompt.builder()
@@ -82,6 +91,7 @@ public class DefaultAgentService implements IAgentService {
         ChatResponse response = chatClient
                 .prompt(prompt)
                 .options(chatOptions)
+//                .advisors(advisor)
                 .call()
                 .chatClientResponse()
                 .chatResponse();

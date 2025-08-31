@@ -8,8 +8,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.core.io.Resource;
 
@@ -22,19 +22,21 @@ public class DefaultEmbeddingService implements IEmbeddingService {
 
     private IVectorStoreFactory vectorStoreFactory;
 
+    private static final String META_PARAM_KNOWLEDGE_BASE_ID = "knowledgeBaseId";
+    private static final String META_PARAM_KNOWLEDGE_ITEM_ID = "knowledgeItemId";
+
     public DefaultEmbeddingService(IVectorStoreFactory vectorStoreFactory) {
         this.vectorStoreFactory = vectorStoreFactory;
     }
 
-    @Override
-    public String vectorize(String contentId, Resource documentResource, Map<String, Object> vectorizeOptions) {
+    public String vectorize(String knowledgeBaseId, String knowledgeItemId, Resource documentResource, Map<String, Object> vectorizeOptions) {
 
         //read document
         TikaDocumentReader reader = new TikaDocumentReader(documentResource);
         List<Document> documents = reader.get();
         documents.forEach(document -> {
-            document.getMetadata().put("contentId", contentId);
-            document.getMetadata().put("taskId",vectorizeOptions.get("taskId"));
+            document.getMetadata().put(META_PARAM_KNOWLEDGE_BASE_ID, knowledgeBaseId);
+            document.getMetadata().put(META_PARAM_KNOWLEDGE_ITEM_ID, knowledgeItemId);
         });
 
         //chunking
@@ -74,7 +76,9 @@ public class DefaultEmbeddingService implements IEmbeddingService {
         try {
             //删除已有 content 的 document
             FilterExpressionBuilder feb = new FilterExpressionBuilder();
-            vectorStore.delete(feb.eq("contentId", contentId).build());
+            Filter.Expression deleteExpress = feb.and(new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_BASE_ID, knowledgeBaseId),
+                    new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_ITEM_ID, knowledgeItemId)).build();
+            vectorStore.delete(deleteExpress);
             //添加新的
             vectorStore.add(splittingDocuments);
         } catch (Exception e) {
@@ -87,16 +91,19 @@ public class DefaultEmbeddingService implements IEmbeddingService {
     }
 
     @Override
-    public List<Document> findVectors(String contentId, String providerName, String modelName) {
+    public List<Document> findVectors(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName) {
         ExtendedPgVectorStore vectorStore = (ExtendedPgVectorStore) this.vectorStoreFactory.getVectorStore(providerName, modelName);
         if (vectorStore == null) {
             return new ArrayList<>();
         }
-        return vectorStore.findVectors(new FilterExpressionBuilder().eq("contentId",contentId).build());
+        FilterExpressionBuilder feb = new FilterExpressionBuilder();
+        Filter.Expression findExpress = feb.and(new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_BASE_ID, knowledgeBaseId),
+                new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_ITEM_ID, knowledgeItemId)).build();
+        return vectorStore.findVectors(findExpress);
     }
 
     @Override
-    public Pair<Boolean,String> deleteVectorize(String contentId, String providerName, String modelName) {
+    public Pair<Boolean,String> deleteVectorize(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName) {
         VectorStore vectorStore = this.vectorStoreFactory.getVectorStore(providerName,modelName);
         if (vectorStore == null) {
             String message = StringHelper.format("Cannot found vectorStore by providerName: {0}, modelName: {1}", providerName, modelName);
@@ -104,8 +111,12 @@ public class DefaultEmbeddingService implements IEmbeddingService {
             return Pair.of(false,message);
         }
 
+        FilterExpressionBuilder feb = new FilterExpressionBuilder();
+        Filter.Expression deleteExpress = feb.and(new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_BASE_ID, knowledgeBaseId),
+                new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_ITEM_ID, knowledgeItemId)).build();
+
         try {
-            vectorStore.delete(new FilterExpressionBuilder().eq("contentId", contentId).build());
+            vectorStore.delete(deleteExpress);
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());

@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    const contentId = searchParams.get('contentId');
+    const knowledgeBaseId = searchParams.get('knowledgeBaseId');
+    const knowledgeItemId = searchParams.get('knowledgeItemId');
     const providerName = searchParams.get('providerName');
     const modelName = searchParams.get('modelName');
 
@@ -39,7 +40,8 @@ export async function GET(request: NextRequest) {
     const vectorizationUrl = `${computeServerBaseUrl}${computeServerVectorizationFindApi}`;
 
     const queryParams = new URLSearchParams({
-        contentId: contentId || '',
+        knowledgeBaseId: knowledgeBaseId || '',
+        knowledgeItemId: knowledgeItemId || '',
         providerName: providerName || '',
         modelName: modelName || ''
     });
@@ -60,7 +62,8 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    const contentId = searchParams.get('contentId');
+    const knowledgeBaseId = searchParams.get('knowledgeBaseId');
+    const knowledgeItemId = searchParams.get('knowledgeItemId');
     const providerName = searchParams.get('providerName');
     const modelName = searchParams.get('modelName');
 
@@ -69,7 +72,8 @@ export async function DELETE(request: NextRequest) {
     const vectorizationUrl = `${computeServerBaseUrl}${computeServerVectorizationFindApi}`;
 
     const queryParams = new URLSearchParams({
-        contentId: contentId || '',
+        knowledgeBaseId: knowledgeBaseId || '',
+        knowledgeItemId: knowledgeItemId || '',
         providerName: providerName || '',
         modelName: modelName || ''
     });

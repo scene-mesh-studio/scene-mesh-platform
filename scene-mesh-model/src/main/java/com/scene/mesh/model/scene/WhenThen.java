@@ -37,8 +37,16 @@ public class WhenThen {
         private Double temperature;
         private Integer topP;
         private String[] mcps;
+        private KnowledgeBase[] knowledgeBases;
         @JsonDeserialize(using = OutputActionsDeserializer.class)
         private List<OutputAction> outputActions;
+    }
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class KnowledgeBase {
+        private String id;
+        private int priority;
     }
 
     @Data

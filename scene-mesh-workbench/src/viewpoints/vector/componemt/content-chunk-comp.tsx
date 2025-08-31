@@ -11,19 +11,21 @@ import { useEffect, useState } from 'react';
 interface ContentChunkCompProps {
     providerName: string;
     modelName: string;
-    contentId: string;
+    knowledgeBaseId: string;
+    knowledgeItemId: string;
     chunksRefresh: number;
 }
 
 export function ContentChunkComp(props: ContentChunkCompProps) {
-    const { providerName, modelName, contentId,chunksRefresh } = props;
+    const { providerName, modelName, knowledgeBaseId, knowledgeItemId ,chunksRefresh } = props;
     const [textChunks, setTextChunks] = useState<any>([]); // 分块数据
 
     useEffect(() => {
         const fetchTextChunks = async () => {
 
             const queryParams = new URLSearchParams({
-                contentId,
+                knowledgeBaseId,
+                knowledgeItemId,
                 providerName,
                 modelName
             });
@@ -33,18 +35,25 @@ export function ContentChunkComp(props: ContentChunkCompProps) {
             });
 
             if (response.ok) {
-                const chunks = await response.json();
-                console.log('==========>chunks: ', chunks);
-                setTextChunks(chunks);
+                const result = await response.json();
+                console.log('==========>result: ', result);
+                if (result.error) {
+                    console.error('==========>error: ', result.error);
+                    setTextChunks([]);
+                } else {
+                    setTextChunks(result);
+                }
         
             } else {
                 // 处理HTTP错误
                 const errorData = await response.json().catch(() => ({}));
                 console.error('==========>errorData: ', errorData);
+                setTextChunks([]);
             }
+            console.log('==========>textChunks: ', textChunks);
         }
         fetchTextChunks();
-    },[providerName, modelName, contentId, chunksRefresh]);
+    },[providerName, modelName, knowledgeBaseId, knowledgeItemId, chunksRefresh, textChunks]);
 
     return (
     <Card shadow="sm" p="lg" radius="md">
@@ -58,7 +67,7 @@ export function ContentChunkComp(props: ContentChunkCompProps) {
                     />
                     <Text size="sm" fw={500}>文本分块</Text>
                 </Group>
-                <Text size="sm" c="dimmed">共 {textChunks.length} 个分段</Text>
+                <Text size="sm" c="dimmed">共 {textChunks?.length || 0} 个分段</Text>
             </Group>
 
             <Box style={{
@@ -66,7 +75,7 @@ export function ContentChunkComp(props: ContentChunkCompProps) {
                 gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                 gap: '16px'
             }}>
-                {textChunks.map((chunk: any, index: number) => (
+                {textChunks?.map((chunk: any, index: number) => (
                     <Card
                         key={index}
                         p="md"

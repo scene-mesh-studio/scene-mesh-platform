@@ -97,7 +97,8 @@ export function VectorizationTaskView() {
     const modelName = knowledgeBase.values?.embeddingsModel.values?.name;
 
     const taskData = {
-        content_id: contentId,
+        knowledgeBase_id: knowledgeBaseId,
+        knowledgeItem_id: knowledgeItemId,
         content_url: contentUrl,
         options: {
             providerName: providerName,
@@ -154,13 +155,14 @@ export function VectorizationTaskView() {
         }
     }
 
-    const onDelete = async (providerName: string, modelName: string, contentId: string) => {
+    const onDelete = async (providerName: string, modelName: string, knowledgeBaseId: string, knowledgeItemId: string) => {
         try {
             setIsLoading(true);
             const queryParams = new URLSearchParams({
                 providerName,
                 modelName,
-                contentId
+                knowledgeBaseId,
+                knowledgeItemId
             });
             const response = await fetch(`/api/vectorization?${queryParams}`, {
                 method: 'DELETE'
@@ -317,7 +319,7 @@ export function VectorizationTaskView() {
                         color="red"
                         size="sm"
                         h={30}
-                        onClick={() => onDelete(providerName, modelName, contentId)}
+                        onClick={() => onDelete(providerName, modelName, knowledgeBaseId, knowledgeItemId)}
                         loading={isLoading}
                         disabled={isLoading}
                     >
@@ -329,7 +331,8 @@ export function VectorizationTaskView() {
             <ContentChunkComp
                 providerName={providerName}
                 modelName={modelName}
-                contentId={contentId}
+                knowledgeBaseId={knowledgeBaseId}
+                knowledgeItemId={knowledgeItemId}
                 chunksRefresh={chunksRefresh}
             />
         </Box>

@@ -22,4 +22,11 @@ public class VectorizationTask extends BaseGeneralTask{
         return options;
     }
 
+    public String getKnowledgeBaseId() {
+        return (String) this.getPayloadVal("knowledgeBase_id");
+    }
+
+    public String getKnowledgeItemId() {
+        return  (String) this.getPayloadVal("knowledgeItem_id");
+    }
 }

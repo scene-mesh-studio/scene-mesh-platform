@@ -57,6 +57,7 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
   // Get data sources from the e-engine
   const llmProviderDataSource = engine.datasourceFactory.getDataSource();
   const mcpDataSource = engine.datasourceFactory.getDataSource();
+  const knowledgeBaseDataSource = engine.datasourceFactory.getDataSource();
 
   // Cast incoming data to the official LlmNodeData type
   const data = nodeData as LlmNodeData;
@@ -64,6 +65,7 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
   // --- State for dynamic data ---
   const [modelProviders, setModelProviders] = useState<IEntityObject[]>([]);
   const [mcpOptions, setMcpOptions] = useState<IEntityObject[]>([]);
+  const [knowledgeBaseOptions, setKnowledgeBaseOptions] = useState<IEntityObject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // --- State Management for Dialogs ---
@@ -83,18 +85,22 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
           return;
         }
 
-        const [providersResult, mcpsResult] = await Promise.all([
+        const [providersResult, mcpsResult, knowledgeBaseResult] = await Promise.all([
           llmProviderDataSource.findManyWithReferences({
-            modelName: "languageModelProvider",
+            modelName: "intelligentModelProvider",
             childrenFieldName: "models",
           }),
           mcpDataSource.findMany({
             modelName: "mcpService",
           }),
+          knowledgeBaseDataSource.findMany({
+            modelName: "knowledgeBase",
+          }),
         ]);
 
         setModelProviders(providersResult.data);
         setMcpOptions(mcpsResult.data.filter(mcp => mcp.values.enable));
+        setKnowledgeBaseOptions(knowledgeBaseResult.data);
       } catch (error) {
         console.error("Failed to fetch node options:", error);
       } finally {
@@ -103,7 +109,7 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
     };
 
     fetchData();
-  }, [llmProviderDataSource, mcpDataSource]);
+  }, [llmProviderDataSource, mcpDataSource, knowledgeBaseDataSource]);
 
   // --- Event Handlers ---
   const handleOpenEditDialog = () => {
@@ -115,6 +121,7 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
       promptVariables: data.promptVariables || [],
       outputActions: data.outputActions || [],
       mcps: data.mcps || [],
+      knowledgeBases: data.knowledgeBases || [],
     });
     setEditDialogOpen(true);
   };
@@ -194,6 +201,7 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
         temperature: editedData.temperature,
         topP: editedData.topP,
         mcps: editedData.mcps,
+        knowledgeBases: editedData.knowledgeBases,
         outputActions: editedData.outputActions,
         errors: editedData.errors,
       };
@@ -245,7 +253,13 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
     const provider = modelProviders.find(
       p => p.values.name === editedData.modelProvider,
     );
-    return (provider?.values.models as IEntityObject[]) || [];
+    const languageModels: IEntityObject[] = [];
+    provider?.values.models.map((m: IEntityObject) => {
+      if(m.values.feature.includes('reason')){
+        languageModels.push(m);
+      }
+    });
+    return languageModels;
   }, [editedData?.modelProvider, modelProviders]);
 
   return (
@@ -643,6 +657,47 @@ const LLMComputeNode: React.FC<NodeProps<SceneFlowNode>> = props => {
                   )}
                 />
                 {/* --- MODIFICATION END --- */}
+                
+                {/* 知识库选择字段 */}
+                <Autocomplete
+                  multiple
+                  options={knowledgeBaseOptions}
+                  getOptionLabel={option =>
+                    (option.values?.name as string) || ""
+                  }
+                  isOptionEqualToValue={(option, value) =>
+                    option.id === value.id
+                  }
+                  value={editedData.knowledgeBases
+                    .map((kb: { id: string; priority: number }) => knowledgeBaseOptions.find(opt => opt.id === kb.id))
+                    .filter((kb): kb is IEntityObject => !!kb)}
+                  onChange={(_, newValue) => {
+                    const knowledgeBasesWithPriority = newValue.map((v, index) => ({
+                      id: v.id,
+                      priority: index + 1
+                    }));
+                    handleDataChange("knowledgeBases", knowledgeBasesWithPriority);
+                  }}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label="知识库 (Knowledge Bases)"
+                      helperText="选择此节点需要使用的知识库，按选择顺序设置优先级。"
+                    />
+                  )}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => (
+                      <Chip
+                        {...getTagProps({ index })}
+                        key={option.id}
+                        label={`${option.values?.name} (优先级: ${index + 1})`}
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))
+                  }
+                />
+                
                 <TextField
                   fullWidth
                   multiline

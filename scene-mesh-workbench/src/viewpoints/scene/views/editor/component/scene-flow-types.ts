@@ -92,6 +92,10 @@ export interface LlmNodeData extends BaseComputeNodeData {
   temperature?: number;
   topP?: number;
   mcps: string[];
+  knowledgeBases: {
+    id: string;
+    priority: number;
+  }[];
   outputActions: string[];
 }
 

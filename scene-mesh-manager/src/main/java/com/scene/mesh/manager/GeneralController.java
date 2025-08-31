@@ -81,8 +81,8 @@ public class GeneralController {
     }
 
     @GetMapping("/vectors")
-    public ResponseEntity<List<VectorDTO>> getVectorsByContentId(@RequestParam String contentId, @RequestParam String providerName, @RequestParam String modelName) {
-        List<Document> documents = this.embeddingService.findVectors(contentId, providerName, modelName);
+    public ResponseEntity<List<VectorDTO>> getVectorsByKnowledgeId(@RequestParam String knowledgeBaseId, @RequestParam String knowledgeItemId, @RequestParam String providerName, @RequestParam String modelName) {
+        List<Document> documents = this.embeddingService.findVectors(knowledgeBaseId, knowledgeItemId, providerName, modelName);
 
         List<VectorDTO> vectorDTOS = new ArrayList<>();
         if (documents == null || documents.isEmpty())
@@ -99,8 +99,8 @@ public class GeneralController {
     }
 
     @DeleteMapping("/vectors")
-    public ResponseEntity<Pair<Boolean,String>> deleteVector(@RequestParam String contentId, @RequestParam String providerName, @RequestParam String modelName) {
-        Pair<Boolean,String> result = this.embeddingService.deleteVectorize(contentId, providerName, modelName);
+    public ResponseEntity<Pair<Boolean,String>> deleteVector(@RequestParam String knowledgeBaseId, @RequestParam String knowledgeItemId, @RequestParam String providerName, @RequestParam String modelName) {
+        Pair<Boolean,String> result = this.embeddingService.deleteVectorize(knowledgeBaseId, knowledgeItemId, providerName, modelName);
         return ResponseEntity.ok(result);
     }
 }

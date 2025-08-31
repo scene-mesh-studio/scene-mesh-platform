@@ -9,9 +9,9 @@ import java.util.Map;
 
 public interface IEmbeddingService {
 
-    String vectorize(String contentId, Resource documentResource, Map<String,Object> vectorizeOptions);
+    String vectorize(String knowledgeBaseId, String knowledgeItemId, Resource documentResource, Map<String,Object> vectorizeOptions);
 
-    List<Document> findVectors(String contentId, String providerName, String modelName);
+    List<Document> findVectors(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName);
 
-    Pair<Boolean,String> deleteVectorize(String contentId, String providerName, String modelName);
+    Pair<Boolean,String> deleteVectorize(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName);
 }

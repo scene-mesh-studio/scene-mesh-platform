@@ -32,12 +32,14 @@ public class VectorizationTaskProcessor extends BaseTaskProcessor {
     protected void processTask(IGeneralTask task) {
         VectorizationTask vectorizationTask = (VectorizationTask) task;
 
-        String contentId = vectorizationTask.getContentId();
+        String knowledgeBaseId = vectorizationTask.getKnowledgeBaseId();
+        String knowledgeItemId = vectorizationTask.getKnowledgeItemId();
         String contentUrl = vectorizationTask.getContentUrl();
         Map<String, Object> vectorizeOptions = vectorizationTask.getOptions();
 
-        if (contentId == null || contentId.isEmpty() || contentUrl == null
-                || contentUrl.isEmpty() || vectorizeOptions == null
+        if (knowledgeBaseId == null || knowledgeBaseId.isEmpty()
+                || knowledgeItemId == null || knowledgeItemId.isEmpty()
+                || contentUrl == null || contentUrl.isEmpty() || vectorizeOptions == null
         ) {
             vectorizationTask.setStatusMessage("Cannot found required parameters with vectorization task.");
             return;
@@ -56,7 +58,7 @@ public class VectorizationTaskProcessor extends BaseTaskProcessor {
         Resource documentResource = UrlResource.from(contentUrl);
 
         try {
-            String result = this.embeddingService.vectorize(contentId, documentResource, vectorizeOptions);
+            String result = this.embeddingService.vectorize(knowledgeBaseId, knowledgeItemId, documentResource, vectorizeOptions);
             if (result != null) {
                 if ("success".equals(result)) {
                     vectorizationTask.setTaskStatus(TaskStatus.successful);

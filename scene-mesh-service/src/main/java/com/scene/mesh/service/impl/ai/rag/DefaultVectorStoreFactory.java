@@ -34,11 +34,6 @@ public class DefaultVectorStoreFactory implements IVectorStoreFactory {
     }
 
     public VectorStore getVectorStore(String modelProviderName, String embeddingModelName) {
-        String key = modelProviderName + ":" + embeddingModelName;
-        if (this.vectorStores.get(key) != null) {
-            return this.vectorStores.get(key);
-        }
-
         LanguageModelProvider lmp = this.lLmConfigService.getLmpConfig(modelProviderName);
         List<LanguageModel> llms = lmp.getModels();
         if (llms == null || llms.isEmpty()) {
@@ -57,6 +52,11 @@ public class DefaultVectorStoreFactory implements IVectorStoreFactory {
             return null;
         }
 
+        String key = modelProviderName + ":" + embeddingModelName + ":" + lm.getDimensions();
+        if (this.vectorStores.get(key) != null) {
+            return this.vectorStores.get(key);
+        }
+
         IEmbeddingModel embeddingModel = new CompatibleOpenAiEmbeddingModel(lm.getId(),lm.getName(),
                 lmp.getName(), lmp.getApiHost(), lm.getModelPath(), lm.getDimensions(), lmp.getApiKey());
         VectorStore vectorStore = this.buildVectorStore(embeddingModel);
@@ -67,7 +67,7 @@ public class DefaultVectorStoreFactory implements IVectorStoreFactory {
     private VectorStore buildVectorStore(IEmbeddingModel embeddingModel) {
         String storeSchemeName = "public";
         // 作为表名，向量模型的 name 需要做特殊字符处理
-        String storeTableName = generateSafeTableName(embeddingModel.getModelName());
+        String storeTableName = generateSafeTableName(embeddingModel);
         String fullTableName = storeSchemeName + "." + storeTableName;
 
         //基于向量模型创建特定向量表
@@ -103,7 +103,11 @@ public class DefaultVectorStoreFactory implements IVectorStoreFactory {
         jdbcTemplate.execute(sql);
     }
 
-    private String generateSafeTableName(String modelName) {
+    private String generateSafeTableName(IEmbeddingModel embeddingModel) {
+
+        String modelName = embeddingModel.getModelName();
+        int dimensions = embeddingModel.dimensions();
+
         if (modelName == null || modelName.trim().isEmpty()) {
             throw new RuntimeException("modelName is null or empty");
         }
@@ -132,6 +136,9 @@ public class DefaultVectorStoreFactory implements IVectorStoreFactory {
         if (safeName.isEmpty()) {
             throw new RuntimeException("safeName is empty");
         }
+
+        // 补充dimensions
+        safeName = safeName + "_" + dimensions;
 
         return safeName;
     }
