@@ -48,7 +48,6 @@ export function ContentChunkComp(props: ContentChunkCompProps) {
                 // 处理HTTP错误
                 const errorData = await response.json().catch(() => ({}));
                 console.error('==========>errorData: ', errorData);
-                setTextChunks([]);
             }
             console.log('==========>textChunks: ', textChunks);
         }

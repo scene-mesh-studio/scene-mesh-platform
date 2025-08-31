@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.scene.mesh.service.impl.ai.rag.RagConst.META_PARAM_KNOWLEDGE_BASE_ID;
+import static com.scene.mesh.service.impl.ai.rag.RagConst.META_PARAM_KNOWLEDGE_ITEM_ID;
+
 @Slf4j
 public class DefaultEmbeddingService implements IEmbeddingService {
 
     private IVectorStoreFactory vectorStoreFactory;
-
-    private static final String META_PARAM_KNOWLEDGE_BASE_ID = "knowledgeBaseId";
-    private static final String META_PARAM_KNOWLEDGE_ITEM_ID = "knowledgeItemId";
 
     public DefaultEmbeddingService(IVectorStoreFactory vectorStoreFactory) {
         this.vectorStoreFactory = vectorStoreFactory;

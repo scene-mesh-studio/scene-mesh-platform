@@ -11,6 +11,8 @@ import com.scene.mesh.model.action.DefaultMetaAction;
 import com.scene.mesh.model.action.IMetaAction;
 import com.scene.mesh.model.event.DefaultMetaEvent;
 import com.scene.mesh.model.event.IMetaEvent;
+import com.scene.mesh.model.knowledge.KnowledgeBase;
+import com.scene.mesh.model.knowledge.OriginalKnowledgeBase;
 import com.scene.mesh.model.llm.LanguageModel;
 import com.scene.mesh.model.llm.LanguageModelProvider;
 import com.scene.mesh.model.llm.OriginalLanguageModelProvider;
@@ -28,6 +30,8 @@ import com.scene.mesh.service.impl.cache.action.MetaActionCache;
 import com.scene.mesh.service.impl.cache.action.MetaActionCacheProvider;
 import com.scene.mesh.service.impl.cache.event.MetaEventCache;
 import com.scene.mesh.service.impl.cache.event.MetaEventCacheProvider;
+import com.scene.mesh.service.impl.cache.knowledge.KnowledgeCache;
+import com.scene.mesh.service.impl.cache.knowledge.KnowledgeCacheProvider;
 import com.scene.mesh.service.impl.cache.llm.LlmCache;
 import com.scene.mesh.service.impl.cache.llm.LlmCacheProvider;
 import com.scene.mesh.service.impl.cache.mcp.McpServerCache;
@@ -64,6 +68,8 @@ public class MutableCacheService {
 
     private final CacheObjectContainer<McpServerCache, McpServer> mcpServerCacheContainerProvider;
 
+    private final CacheObjectContainer<KnowledgeCache, KnowledgeBase> knowledgeCacheContainerProvider;
+
     private final ApiClient apiClient;
 
     public MutableCacheService(ICache cache, ApiClient apiClient) {
@@ -90,6 +96,9 @@ public class MutableCacheService {
 
         mcpServerCacheContainerProvider =
                 new NonExpiringCacheObjectContainer<>(new McpServerCacheProvider(cache), true);
+
+        knowledgeCacheContainerProvider =
+                new NonExpiringCacheObjectContainer<>(new KnowledgeCacheProvider(cache), true);
     }
 
     public TerminalSession getTerminalSessionByTerminalId(String terminalId) {
@@ -130,7 +139,63 @@ public class MutableCacheService {
         List<McpServer> mcpServers = this.extractMcpServers(originalMcpServers);
         this.mcpServerCacheContainerProvider.refresh(mcpServers);
 
+        // refresh knowledgeBase
+        List<OriginalKnowledgeBase> originalKnowledgeBases = this.getAllOriginalKnowledgeBases();
+        List<KnowledgeBase> knowledgeBases = this.extractKnowledgeBases(originalKnowledgeBases);
+        this.knowledgeCacheContainerProvider.refresh(knowledgeBases);
+
         return true;
+    }
+
+    private List<KnowledgeBase> extractKnowledgeBases(List<OriginalKnowledgeBase> originalKnowledgeBases) {
+        List<KnowledgeBase> knowledgeBases = new ArrayList<>();
+
+        for (OriginalKnowledgeBase originalKnowledgeBase : originalKnowledgeBases) {
+            if (originalKnowledgeBase.getValues().getProvider() == null || originalKnowledgeBase.getValues().getEmbeddingsModel() == null) {
+                continue;
+            }
+            KnowledgeBase knowledgeBase = new KnowledgeBase();
+            knowledgeBase.setId(originalKnowledgeBase.getId());
+            knowledgeBase.setName(originalKnowledgeBase.getValues().getName());
+            knowledgeBase.setProviderName(originalKnowledgeBase.getValues().getProvider().getValues().getName());
+            knowledgeBase.setModelName(originalKnowledgeBase.getValues().getEmbeddingsModel().getValues().getName());
+            knowledgeBase.setDescription(originalKnowledgeBase.getValues().getDescription());
+            knowledgeBase.setEnabled(originalKnowledgeBase.getValues().getEnabled());
+
+            OriginalKnowledgeBase.KnowledgeItem[] knowledgeItems = originalKnowledgeBase.getValues().getKnowledgeItems();
+            if (knowledgeItems != null) {
+                String[] items = new String[knowledgeItems.length];
+                for (int i = 0; i < knowledgeItems.length; i++) {
+                    items[i] = knowledgeItems[i].getId();
+                }
+                knowledgeBase.setKnowledgeItemIds(items);
+            }
+            knowledgeBases.add(knowledgeBase);
+        }
+
+        return knowledgeBases;
+    }
+
+    private List<OriginalKnowledgeBase> getAllOriginalKnowledgeBases() {
+        Map<String, String> params = new HashMap<>();
+        params.put("withReference", "true");
+        Object responseObj = this.apiClient.get(ApiClient.ServiceType.knowledgebase.name(), "", Object.class, params);
+        if (responseObj == null) {
+            throw new RuntimeException("invoke knowledgeBase list api,but not found any object.");
+        }
+        Map<String, Object> responseObjMap = SimpleObjectHelper.obj2Map(responseObj);
+        Object result = responseObjMap.get("result");
+        Map<String, Object> resultMap = SimpleObjectHelper.obj2Map(result);
+        List<Object> baseObjects = (List<Object>) resultMap.get("data");
+
+        List<OriginalKnowledgeBase> knowledgeBases = new ArrayList<>();
+
+        for (Object baseObject : baseObjects) {
+            OriginalKnowledgeBase originalKnowledgeBase = SimpleObjectHelper.obj2SpecificObj(baseObject, new TypeReference<>() {
+            });
+            knowledgeBases.add(originalKnowledgeBase);
+        }
+        return knowledgeBases;
     }
 
     private List<OriginalMcpServer> getAllOriginalMcpServers() {
@@ -500,5 +565,9 @@ public class MutableCacheService {
 
     public List<McpServer> getAllMcpServers() {
         return this.mcpServerCacheContainerProvider.read().getAllMcpServers();
+    }
+
+    public KnowledgeBase getKnowledgeById(String kbId) {
+        return this.knowledgeCacheContainerProvider.read().getKnowledge(kbId);
     }
 }

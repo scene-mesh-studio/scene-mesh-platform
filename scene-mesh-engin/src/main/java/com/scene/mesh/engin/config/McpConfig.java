@@ -32,31 +32,23 @@ public class McpConfig {
     private String mcpServerUrl;
 
     private ToolCallbackProviderWithId actionToolCallbackProvider() {
+        // 创建 SSE 传输层
+        WebClient.Builder webClientBuilder = WebClient.builder()
+                .baseUrl(mcpServerUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE);
+
+        McpClientTransport transport = WebFluxSseClientTransport
+                .builder(webClientBuilder)
+                .sseEndpoint("/sse")
+                .build();
         try {
-            // 创建 SSE 传输层
-            WebClient.Builder webClientBuilder = WebClient.builder()
-                    .baseUrl(mcpServerUrl)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.TEXT_EVENT_STREAM_VALUE);
-
-            McpClientTransport transport = WebFluxSseClientTransport
-                    .builder(webClientBuilder)
-                    .sseEndpoint("/sse")
-                    .build();
-
             McpSyncClient mcpClient = McpClient.sync(transport).build();
-            try {
-                mcpClient.initialize();
-            } catch (Exception e) {
-                log.error("Failed to initialize Scene Mesh MCP client", e);
-                return null;
-            }
-
+            mcpClient.initialize();
             return new ToolCallbackProviderWithId("action", mcpClient);
-
         } catch (Exception e) {
-            log.error("Failed to create Scene Mesh MCP client", e);
-            throw new RuntimeException("MCP client initialization failed", e);
+            log.error("Failed to initialize Scene Mesh MCP client", e);
+            return null;
         }
     }
 
@@ -109,8 +101,14 @@ public class McpConfig {
     public ToolCallbackProviderManager sceneMeshToolCallbackProvider(IMcpServerService mcpServerService) {
 
         ToolCallbackProviderManager toolCallbackProviderManager = new ToolCallbackProviderManager();
-        toolCallbackProviderManager.registerToolCallbackProvider(actionToolCallbackProvider());
 
+        // action mcp tools
+        ToolCallbackProviderWithId actionToolCallbackProvider = actionToolCallbackProvider();
+        if (actionToolCallbackProvider != null) {
+            toolCallbackProviderManager.registerToolCallbackProvider(actionToolCallbackProvider);
+        }
+
+        // real mcp tools
         List<ToolCallbackProvider> realToolCallbackProviders = realToolCallbackProviders(mcpServerService);
 
         for (ToolCallbackProvider toolCallbackProvider : realToolCallbackProviders) {

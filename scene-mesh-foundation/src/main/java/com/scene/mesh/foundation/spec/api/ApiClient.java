@@ -65,5 +65,6 @@ public class ApiClient {
         product,
         llm,
         mcpserver,
+        knowledgebase,
     }
 }

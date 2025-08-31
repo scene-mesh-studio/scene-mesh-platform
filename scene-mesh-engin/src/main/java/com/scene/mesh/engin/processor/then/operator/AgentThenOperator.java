@@ -32,7 +32,7 @@ public class AgentThenOperator implements IThenOperator{
 
     public AgentThenOperator(ILLmConfigService llmConfigService, IToolsService toolsService, IMetaEventService metaEventService) {
         IChatClientFactory chatClientFactory = new DefaultChatClientFactory(llmConfigService);
-        this.agentService = new DefaultAgentService(chatClientFactory,toolsService);
+        this.agentService = new DefaultAgentService(chatClientFactory,null, toolsService);
         this.metaEventService = metaEventService;
     }
 

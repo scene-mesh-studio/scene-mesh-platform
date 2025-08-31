@@ -8,6 +8,8 @@ import com.scene.mesh.service.spec.ai.chat.IChatClientFactory;
 import com.scene.mesh.service.spec.ai.chat.IPromptService;
 import com.scene.mesh.service.spec.ai.mcp.IToolsService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -19,6 +21,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +54,7 @@ public class DefaultAgentService implements IAgentService {
         String scenePrompt = then.getPromptTemplate();
         Double temperature = then.getTemperature();
         Integer topP = then.getTopP();
-        WhenThen.KnowledgeBase[] kbs = then.getKnowledgeBases();//TODO kbs process
+        WhenThen.KnowledgeBase[] kbs = then.getKnowledgeBases();
 
         // needful action ids
         List<String> actionIds = new ArrayList<>();
@@ -70,7 +73,16 @@ public class DefaultAgentService implements IAgentService {
         );
 
         // needful advisor
-//        Advisor advisor = this.advisorFactory.getAdvisors();
+        Map<String, Object> advisorsInput = new HashMap<>();
+        if (kbs != null && kbs.length > 0) {
+            Pair[] knowledgeBasePairs = new Pair[kbs.length];
+            for (int i = 0; i < kbs.length; i++) {
+                WhenThen.KnowledgeBase kb = kbs[i];
+                knowledgeBasePairs[i] = new ImmutablePair<>(kb.getId(),kb.getPriority());
+            }
+            advisorsInput.put("knowledgeBase", knowledgeBasePairs);
+        }
+        List<Advisor> advisors = this.advisorFactory.getMutableAdvisors(advisorsInput);
 
         String userMessage = this.promptService.assembleUserMessage(templateResource, variables);
         Prompt prompt = Prompt.builder()
@@ -91,7 +103,7 @@ public class DefaultAgentService implements IAgentService {
         ChatResponse response = chatClient
                 .prompt(prompt)
                 .options(chatOptions)
-//                .advisors(advisor)
+                .advisors(advisors)
                 .call()
                 .chatClientResponse()
                 .chatResponse();

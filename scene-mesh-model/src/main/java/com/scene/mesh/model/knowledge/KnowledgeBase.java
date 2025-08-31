@@ -7,11 +7,8 @@ public class KnowledgeBase {
     private String id;
     private String name;
     private String description;
-    private String type;
-    private String baseUrl;
-    private String endpoint;
-    private String header;
-    private Integer timeout;
+    private String[] knowledgeItemIds;
+    private String providerName;
+    private String modelName;
     private Boolean enabled;
-
 }

@@ -39,6 +39,10 @@ public class FoundationConfig {
     @Value("${scene-mesh.api-client.urls.mcpserver}")
     private String mcpServerUrl;
 
+    @Value("${scene-mesh.api-client.urls.knowledgeBase}")
+    private String knowledgebaseUrl;
+
+
     @Bean
     public SpringComponentProvider componentProvider() {
         return new SpringComponentProvider();
@@ -77,6 +81,7 @@ public class FoundationConfig {
         urls.put(ApiClient.ServiceType.product.name(),productUrl);
         urls.put(ApiClient.ServiceType.llm.name(),llmUrl);
         urls.put(ApiClient.ServiceType.mcpserver.name(),mcpServerUrl);
+        urls.put(ApiClient.ServiceType.knowledgebase.name(),knowledgebaseUrl);
         ApiClient apiClient = new ApiClient(urls);
         apiClient.__init__();
         return apiClient;

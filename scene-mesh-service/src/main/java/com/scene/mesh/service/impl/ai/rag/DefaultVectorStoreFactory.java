@@ -21,7 +21,7 @@ import static com.scene.mesh.service.impl.ai.rag.ExtendedPgVectorStore.PgIndexTy
 @Slf4j
 public class DefaultVectorStoreFactory implements IVectorStoreFactory {
 
-    private Map<String, VectorStore> vectorStores;
+    private final Map<String, VectorStore> vectorStores;
     private final JdbcTemplate jdbcTemplate;
 
     private final ILLmConfigService lLmConfigService;

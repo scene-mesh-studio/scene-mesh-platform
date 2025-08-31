@@ -37,3 +37,4 @@ scene-mesh:
       product: http://localhost:3000/api/ee/services/objects/product?withReference=true
       llm: http://localhost:3000/api/ee/services/objects/intelligentModelProvider?withReference=true
       mcpserver: http://localhost:3000/api/ee/services/objects/mcpService?withReference=true
+      knowledgeBase: http://localhost:3000/api/ee/services/objects/knowledgeBase?withReference=true
