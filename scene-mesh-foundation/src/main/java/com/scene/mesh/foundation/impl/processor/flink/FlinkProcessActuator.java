@@ -61,10 +61,12 @@ public class FlinkProcessActuator implements IProcessActuator {
         for (ProcessorNode pn : this.processorGraph.getNodes()) {
             if (this.processorGraph.isProducerNode(pn.getId())) {
                 FlinkProcessProducer producer = new FlinkProcessProducer(pn, this.componentProvider);
+                producer.setEnv(System.getProperty("execute.env"));
                 FlinkProcessorChainNode chainNode = new FlinkProcessorChainNode(producer);
                 this.chainNodeMap.put(pn.getId(), chainNode);
             } else {
                 FlinkProcessConsumer consumer = new FlinkProcessConsumer(pn, this.componentProvider);
+                consumer.setEnv(System.getProperty("execute.env"));
                 FlinkProcessorChainNode chainNode = new FlinkProcessorChainNode(consumer);
                 this.chainNodeMap.put(pn.getId(), chainNode);
             }

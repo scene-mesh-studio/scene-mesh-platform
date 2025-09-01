@@ -22,7 +22,7 @@ public class SpringApplicationContextUtils {
             return applicationContext;
         } else {
             //synchronized (lockObj) {
-            applicationContext = new ClassPathXmlApplicationContext(contextId == null ? "worker.xml" : contextId);
+            applicationContext = new ClassPathXmlApplicationContext(contextId == null ? "work.xml" : contextId);
             return applicationContext;
             //}
         }

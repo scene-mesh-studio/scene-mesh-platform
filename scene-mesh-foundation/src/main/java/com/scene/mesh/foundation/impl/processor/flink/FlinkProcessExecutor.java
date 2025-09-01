@@ -1,9 +1,11 @@
 package com.scene.mesh.foundation.impl.processor.flink;
 
+import com.scene.mesh.foundation.impl.helper.SimpleObjectHelper;
 import com.scene.mesh.foundation.spec.component.IComponentProvider;
 import com.scene.mesh.foundation.spec.processor.config.ProcessorGraph;
 import com.scene.mesh.foundation.spec.processor.execute.IProcessExecutor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.*;
 
 import java.time.Duration;
@@ -11,6 +13,7 @@ import java.time.Duration;
 /**
  * flink 处理器
  */
+@Slf4j
 public class FlinkProcessExecutor implements IProcessExecutor {
 
     private final IComponentProvider componentProvider;
@@ -20,7 +23,7 @@ public class FlinkProcessExecutor implements IProcessExecutor {
     @Setter
     private int webPort;
 
-    public void __init__(){
+    public void __init__() {
         this.configuration = new Configuration();
         // Rest 配置
 //        configuration.set(RestOptions.PORT,webPort);
@@ -42,8 +45,15 @@ public class FlinkProcessExecutor implements IProcessExecutor {
 
     @Override
     public void execute(ProcessorGraph processorGraph, String... args) throws Exception {
+        String env = System.getProperty("execute.env");
+        if (env != null) {
+            this.configuration.setString("execute.env", env);
+            String json = SimpleObjectHelper.strMap2json(configuration.toMap());
+            log.info("FlinkProcessExecutor Configuration json:{}", json);
+            log.info("传递环境变量到 Flink Configuration: execute.env={}", env);
+        }
         FlinkProcessActuator actuator =
-                new FlinkProcessActuator(this.componentProvider,this.configuration);
+                new FlinkProcessActuator(this.componentProvider, this.configuration);
         actuator.initialize(processorGraph, args);
         actuator.launch();
     }

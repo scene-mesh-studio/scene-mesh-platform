@@ -1,16 +1,17 @@
 package com.scene.mesh.foundation.impl.processor.flink;
 
+import com.scene.mesh.foundation.impl.helper.SimpleObjectHelper;
 import com.scene.mesh.foundation.spec.component.IComponentProvider;
 import com.scene.mesh.foundation.spec.processor.IProcessor;
 import com.scene.mesh.foundation.spec.processor.config.ProcessorNode;
 import com.scene.mesh.foundation.impl.processor.ProcessActivateContext;
 import com.scene.mesh.foundation.impl.processor.ProcessInput;
 import com.scene.mesh.foundation.impl.processor.ProcessOutput;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 
-/**
- */
+@Slf4j
 public class FlinkProcessProducer extends RichSourceFunction implements IFlinkProcessorAgent {
 
     private final boolean asProducer;
@@ -19,6 +20,7 @@ public class FlinkProcessProducer extends RichSourceFunction implements IFlinkPr
     private IProcessor processor;
     private boolean willCancel;
     private Class outputType;
+    private String env;
 
     public FlinkProcessProducer(ProcessorNode processorNode, IComponentProvider componentProvider) {
         this.processorNode = processorNode;
@@ -81,7 +83,12 @@ public class FlinkProcessProducer extends RichSourceFunction implements IFlinkPr
 
     @Override
     public void open(Configuration parameters) throws Exception {
+        System.setProperty("execute.env", env);
         super.open(parameters);
         this.open();
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
     }
 }

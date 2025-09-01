@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -100,5 +99,13 @@ public class SimpleObjectHelper {
             return String.valueOf(dateVal.getTime());
         }
         return val.toString();
+    }
+
+    public static String strMap2json(Map<String, String> map) {
+        try {
+            return objectMapper.writeValueAsString(map);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

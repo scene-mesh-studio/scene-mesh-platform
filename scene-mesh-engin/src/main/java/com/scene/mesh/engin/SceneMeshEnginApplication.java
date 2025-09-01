@@ -42,19 +42,19 @@ public class SceneMeshEnginApplication {
 
         System.setProperty("execute.env", env);
 
-        Class[] configClasses = new Class[]{
-                EnginConfig.class,
-                FoundationConfig.class,
-                McpConfig.class,
-                ServiceConfig.class
-        };
-
-        SpringApplicationContextUtils.setContextClass(configClasses);
-
-        log.info("执行引擎启动...  加载引擎配置:{}", Arrays.toString(configClasses));
+//        Class[] configClasses = new Class[]{
+//                EnginConfig.class,
+//                FoundationConfig.class,
+//                McpConfig.class,
+//                ServiceConfig.class
+//        };
+//
+//        SpringApplicationContextUtils.setContextClass(configClasses);
+//        log.info("执行引擎启动...  加载引擎配置:{}", Arrays.toString(configClasses));
+        SpringApplicationContextUtils.setContextId("work.xml");
 
         IProcessManager processManager = SpringApplicationContextUtils
-                .getApplicationContextByAnnotation()
+                .getApplicationContext()
                 .getBean(IProcessManager.class);
 
         //注册when graph

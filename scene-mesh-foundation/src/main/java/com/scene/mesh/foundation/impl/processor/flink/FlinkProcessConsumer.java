@@ -7,13 +7,13 @@ import com.scene.mesh.foundation.spec.processor.config.ProcessorNode;
 import com.scene.mesh.foundation.impl.processor.ProcessActivateContext;
 import com.scene.mesh.foundation.impl.processor.ProcessInput;
 import com.scene.mesh.foundation.impl.processor.ProcessOutput;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 
 
-/**
- */
+@Slf4j
 public class FlinkProcessConsumer extends RichFlatMapFunction implements IFlinkProcessorAgent {
 
     private final boolean asProducer;
@@ -22,6 +22,7 @@ public class FlinkProcessConsumer extends RichFlatMapFunction implements IFlinkP
     private IProcessor processor;
     private final boolean willCancel;
     private Class outputType;
+    private String env;
 
     public FlinkProcessConsumer(ProcessorNode processorNode, IComponentProvider componentProvider) {
         this.processorNode = processorNode;
@@ -60,6 +61,7 @@ public class FlinkProcessConsumer extends RichFlatMapFunction implements IFlinkP
 
     @Override
     public void open(Configuration parameters) throws Exception {
+        System.setProperty("execute.env", env);
         super.open(parameters);
         this.open();
     }
@@ -77,5 +79,9 @@ public class FlinkProcessConsumer extends RichFlatMapFunction implements IFlinkP
     @Override
     public Class getOutputType() {
         return this.processorNode.getOutputType() == null ? Object.class : this.processorNode.getOutputType();
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
     }
 }
