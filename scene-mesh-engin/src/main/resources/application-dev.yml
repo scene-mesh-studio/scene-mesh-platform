@@ -3,15 +3,13 @@ scene-mesh:
   infrastructure:
     flink-web:
       host: 127.0.0.1
-      port: 8081
+      port: 18081
     redis:
       host: localhost
       port: 6379
     message:
       batch-size: 10
       timeout-seconds: 1
-  environment:
-    name: dev
   # 主题配置
   topics:
     inbound-events: inbound_events
@@ -19,18 +17,20 @@ scene-mesh:
     outbound-actions: outbound_actions
   # AI配置
   ai:
-    provider:
-      zhipu:
-        api-key: 58245a200b71437bbece2b85c71c844a.uJKQJvMhutDrPQPE
     mcp:
       server:
         url: http://localhost:9002
-
+    # 向量数据库
+    vector:
+      store:
+        url: jdbc:postgresql://127.0.0.1:5432/compute
+        username: sm
+        password: scene_mesh
+        driver: org.postgresql.Driver
   # 消息类配置
   message-classes:
     event: com.scene.mesh.model.event.Event
     scene-matched-result: com.scene.mesh.engin.model.SceneMatchedResult
-
   # api client
   api-client:
     urls:

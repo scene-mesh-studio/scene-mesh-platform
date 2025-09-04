@@ -22,10 +22,12 @@
     "@mantine/core": "8.2.5",
     "@mantine/hooks": "8.2.5",
     "@mantine/modals": "8.2.5",
+    "@mantine/charts": "8.2.5",
+    "@mantine/carousel": "8.2.5",
     "@mantine/notifications": "8.2.5",
     "@mui/icons-material": "^7.3.1",
     "@mui/material": "^7.1.2",
-    "@scenemesh/entity-engine": "^0.1.68",
+    "@scenemesh/entity-engine": "^0.1.76",
     "@types/dagre": "^0.7.52",
     "@xyflow/react": "^12.6.4",
     "dagre": "^0.8.5",
@@ -38,7 +40,9 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.58.1",
     "sonner": "^2.0.7",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "recharts": "3.1.2",
+    "embla-carousel-react": "8.6.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

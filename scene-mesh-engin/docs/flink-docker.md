@@ -63,7 +63,7 @@ docker rm -f jobmanager
 ```
 docker run \
 -itd  \
--v ~/docker-data/flink/JobManager/:/opt/flink/conf/ \
+-v ./docker-data/flink/JobManager/:/opt/flink/conf/ \
 --name=jobmanager \
 --publish 18081:18081 \
 --env FLINK_PROPERTIES="jobmanager.rpc.address: jobmanager" \
@@ -75,7 +75,7 @@ docker run \
 ```
 docker run \
 -itd  \
--v ~/docker-data/flink/TaskManager/:/opt/flink/conf/ \
+-v ./docker-data/flink/TaskManager/:/opt/flink/conf/ \
 --name=taskmanager --network flink-network \
 --env FLINK_PROPERTIES="jobmanager.rpc.address: jobmanager"  \
 flink:1.20.2-scala_2.12-java17 taskmanager

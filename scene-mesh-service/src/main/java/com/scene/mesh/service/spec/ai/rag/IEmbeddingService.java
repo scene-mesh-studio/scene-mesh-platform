@@ -11,7 +11,9 @@ public interface IEmbeddingService {
 
     String vectorize(String knowledgeBaseId, String knowledgeItemId, Resource documentResource, Map<String,Object> vectorizeOptions);
 
-    List<Document> findVectors(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName);
+    Long findCount(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName);
+
+    List<Document> findVectors(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName, int page, int size);
 
     Pair<Boolean,String> deleteVectorize(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName);
 }

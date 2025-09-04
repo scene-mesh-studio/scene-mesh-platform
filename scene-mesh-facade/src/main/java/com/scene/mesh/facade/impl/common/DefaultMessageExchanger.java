@@ -40,6 +40,7 @@ public class DefaultMessageExchanger implements IMessageExchanger {
 
     @Override
     public void handleOutboundAction(Action action) {
+        log.info("handle outbound action: {}", SimpleObjectHelper.objectData2json(action));
         OutboundMessage outboundMessage = new OutboundMessage();
         outboundMessage.setTerminalId(action.getTerminalId());
         outboundMessage.setMessage(SimpleObjectHelper.objectData2json(action));

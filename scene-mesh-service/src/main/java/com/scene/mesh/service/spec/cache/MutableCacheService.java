@@ -54,17 +54,17 @@ import java.util.Map;
  */
 public class MutableCacheService {
 
-    private final CacheObjectContainer<TerminalSessionCache,TerminalSession> terminalSessionCacheContainer;
+    private final CacheObjectContainer<TerminalSessionCache, TerminalSession> terminalSessionCacheContainer;
 
     private final CacheObjectContainer<ProductCache, Product> productCacheContainer;
 
-    private final CacheObjectContainer<MetaEventCache,IMetaEvent> metaEventCacheContainer;
+    private final CacheObjectContainer<MetaEventCache, IMetaEvent> metaEventCacheContainer;
 
     private final CacheObjectContainer<SceneCache, Scene> sceneCacheContainer;
 
     private final CacheObjectContainer<MetaActionCache, IMetaAction> metaActionCacheContainer;
 
-    private final CacheObjectContainer<LlmCache,LanguageModelProvider> llmCacheContainerProvider;
+    private final CacheObjectContainer<LlmCache, LanguageModelProvider> llmCacheContainerProvider;
 
     private final CacheObjectContainer<McpServerCache, McpServer> mcpServerCacheContainerProvider;
 
@@ -77,22 +77,22 @@ public class MutableCacheService {
         this.apiClient = apiClient;
 
         terminalSessionCacheContainer =
-                new NonExpiringCacheObjectContainer<>(new TerminalSessionCacheProvider(cache),false);
+                new NonExpiringCacheObjectContainer<>(new TerminalSessionCacheProvider(cache), false);
 
         productCacheContainer =
-                new NonExpiringCacheObjectContainer<>(new ProductCacheProvider(cache),true);
+                new NonExpiringCacheObjectContainer<>(new ProductCacheProvider(cache), true);
 
         metaEventCacheContainer =
-                new NonExpiringCacheObjectContainer<>(new MetaEventCacheProvider(cache),true);
+                new NonExpiringCacheObjectContainer<>(new MetaEventCacheProvider(cache), true);
 
         sceneCacheContainer =
-                new NonExpiringCacheObjectContainer<>(new SceneCacheProvider(cache),true);
+                new NonExpiringCacheObjectContainer<>(new SceneCacheProvider(cache), true);
 
         metaActionCacheContainer =
-                new NonExpiringCacheObjectContainer<>(new MetaActionCacheProvider(cache),true);
+                new NonExpiringCacheObjectContainer<>(new MetaActionCacheProvider(cache), true);
 
         llmCacheContainerProvider =
-                new NonExpiringCacheObjectContainer<>(new LlmCacheProvider(cache),true);
+                new NonExpiringCacheObjectContainer<>(new LlmCacheProvider(cache), true);
 
         mcpServerCacheContainerProvider =
                 new NonExpiringCacheObjectContainer<>(new McpServerCacheProvider(cache), true);
@@ -115,7 +115,7 @@ public class MutableCacheService {
         return true;
     }
 
-    public boolean refreshAll(){
+    public boolean refreshAll() {
         // refresh product related
         List<OriginalProduct> originalProducts = this.getAllOriginalProducts();
         List<Product> products = this.extractProducts(originalProducts);
@@ -360,22 +360,25 @@ public class MutableCacheService {
                 String aDescription = action.getValues().getDescription();
                 IMetaAction metaAction = new DefaultMetaAction(aId, aName, aDescription, originalProduct.getId());
 
-                action.getValues().getFields().forEach(f -> {
-                    String fName = f.getValues().getFieldName();
-                    String fTitle = f.getValues().getFieldTitle();
-                    String fDes = f.getValues().getFieldDescription();
-                    String fType = f.getValues().getFieldType();
-                    String fCategory = f.getValues().getFieldCategory();
-                    IParameterDataType dataType = confirmDataType(fType);
-                    if (dataType == null) {
-                        throw new RuntimeException("cannot find dataType pass field type:" + fType);
-                    }
-                    MetaParameterDescriptor metaParameterDescriptor = new MetaParameterDescriptor(
-                            fName, fTitle, fDes, dataType, false);
-                    metaParameterDescriptor.setCalculateType("compute".equals(fCategory) ? IParameterCalculator.CalculateType.STT : null);
+                List<OriginalProduct.ActionField> actionFields = action.getValues().getFields();
+                if (actionFields != null && !actionFields.isEmpty()) {
+                    action.getValues().getFields().forEach(f -> {
+                        String fName = f.getValues().getFieldName();
+                        String fTitle = f.getValues().getFieldTitle();
+                        String fDes = f.getValues().getFieldDescription();
+                        String fType = f.getValues().getFieldType();
+                        String fCategory = f.getValues().getFieldCategory();
+                        IParameterDataType dataType = confirmDataType(fType);
+                        if (dataType == null) {
+                            throw new RuntimeException("cannot find dataType pass field type:" + fType);
+                        }
+                        MetaParameterDescriptor metaParameterDescriptor = new MetaParameterDescriptor(
+                                fName, fTitle, fDes, dataType, false);
+                        metaParameterDescriptor.setCalculateType("compute".equals(fCategory) ? IParameterCalculator.CalculateType.STT : null);
 
-                    metaAction.addParameterDescriptor(metaParameterDescriptor);
-                });
+                        metaAction.addParameterDescriptor(metaParameterDescriptor);
+                    });
+                }
                 metaActions.add(metaAction);
             });
         }
@@ -386,15 +389,19 @@ public class MutableCacheService {
         List<Scene> sceneList = new ArrayList<>();
         for (OriginalProduct originalProduct : originalProducts) {
             List<OriginalProduct.Scene> originalScenes = originalProduct.getValues().getRootScene();
-            if (originalScenes == null || originalScenes.isEmpty()) {continue;}
+            if (originalScenes == null || originalScenes.isEmpty()) {
+                continue;
+            }
             OriginalProduct.Scene originalScene = originalScenes.get(0);
-            transformOriginalScene(sceneList,originalScene,originalProduct.getId());
+            transformOriginalScene(sceneList, originalScene, originalProduct.getId());
         }
         return sceneList;
     }
 
-    private void transformOriginalScene(List<Scene> scenes, OriginalProduct.Scene originalScene,String productId){
-        if (originalScene == null) {return;}
+    private void transformOriginalScene(List<Scene> scenes, OriginalProduct.Scene originalScene, String productId) {
+        if (originalScene == null) {
+            return;
+        }
         String sceneId = originalScene.getId();
         String sceneName = originalScene.getValues().getName();
         String sceneDesc = originalScene.getValues().getDescription();
@@ -416,7 +423,7 @@ public class MutableCacheService {
         List<OriginalProduct.Scene> childrens = originalScene.getValues().getChildren();
         if (childrens != null && !childrens.isEmpty()) {
             for (OriginalProduct.Scene childScene : childrens) {
-                transformOriginalScene(scenes, childScene,productId);
+                transformOriginalScene(scenes, childScene, productId);
             }
         }
 
@@ -427,7 +434,9 @@ public class MutableCacheService {
         List<IMetaEvent> metaEvents = new ArrayList<>();
         for (OriginalProduct originalProduct : originalProducts) {
             List<OriginalProduct.Event> events = originalProduct.getValues().getEvents();
-            if (events == null || events.isEmpty()) {continue;}
+            if (events == null || events.isEmpty()) {
+                continue;
+            }
             events.forEach(e -> {
                 String productId = originalProduct.getId();
                 String metaEventId = e.getValues().getName();

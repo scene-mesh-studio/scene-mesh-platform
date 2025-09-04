@@ -199,16 +199,37 @@ public class ExtendedPgVectorStore extends AbstractObservationVectorStore implem
         };
     }
 
-    public List<Document> findVectors(Filter.Expression filterExpression) {
-
+    //    public List<Document> findVectors(Filter.Expression filterExpression) {
+//
+//        String nativeFilterExpression = this.filterExpressionConverter.convertExpression(filterExpression);
+//
+//        String sql = "SELECT id, content, metadata, 0 AS distance FROM " + getFullyQualifiedTableName() + " WHERE metadata::jsonb @@ '"
+//                + nativeFilterExpression + "'::jsonpath";
+//
+//        logger.debug("find vectors sql: {}", sql);
+//
+//        return this.jdbcTemplate.query(sql, this.documentRowMapper);
+//    }
+    public List<Document> findVectors(Filter.Expression filterExpression, int offset, int size) {
         String nativeFilterExpression = this.filterExpressionConverter.convertExpression(filterExpression);
 
         String sql = "SELECT id, content, metadata, 0 AS distance FROM " + getFullyQualifiedTableName() + " WHERE metadata::jsonb @@ '"
-                + nativeFilterExpression + "'::jsonpath";
+                + nativeFilterExpression + "'::jsonpath LIMIT " + size + " OFFSET " + offset;
 
         logger.debug("find vectors sql: {}", sql);
 
         return this.jdbcTemplate.query(sql, this.documentRowMapper);
+    }
+
+    public long countVectors(Filter.Expression filterExpression) {
+        String nativeFilterExpression = this.filterExpressionConverter.convertExpression(filterExpression);
+
+        String sql = "SELECT COUNT(*) FROM " + getFullyQualifiedTableName() + " WHERE metadata::jsonb @@ '"
+                + nativeFilterExpression + "'::jsonpath";
+
+        logger.debug("count vectors sql: {}", sql);
+
+        return this.jdbcTemplate.queryForObject(sql, Long.class);
     }
 
     @Override

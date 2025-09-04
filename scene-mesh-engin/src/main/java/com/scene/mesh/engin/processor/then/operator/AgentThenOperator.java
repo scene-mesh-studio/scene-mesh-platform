@@ -7,6 +7,7 @@ import com.scene.mesh.model.event.Event;
 import com.scene.mesh.model.event.IMetaEvent;
 import com.scene.mesh.model.scene.Scene;
 import com.scene.mesh.model.scene.WhenThen;
+import com.scene.mesh.service.spec.ai.advisor.IAdvisorFactory;
 import com.scene.mesh.service.spec.ai.chat.IAgentService;
 import com.scene.mesh.service.spec.ai.chat.IChatClientFactory;
 import com.scene.mesh.service.impl.ai.chat.DefaultAgentService;
@@ -30,9 +31,12 @@ public class AgentThenOperator implements IThenOperator{
 
     private final IMetaEventService metaEventService;
 
-    public AgentThenOperator(ILLmConfigService llmConfigService, IToolsService toolsService, IMetaEventService metaEventService) {
+    private final IAdvisorFactory advisorFactory;
+
+    public AgentThenOperator(ILLmConfigService llmConfigService, IToolsService toolsService, IMetaEventService metaEventService, IAdvisorFactory advisorFactory) {
+        this.advisorFactory = advisorFactory;
         IChatClientFactory chatClientFactory = new DefaultChatClientFactory(llmConfigService);
-        this.agentService = new DefaultAgentService(chatClientFactory,null, toolsService);
+        this.agentService = new DefaultAgentService(chatClientFactory,advisorFactory, toolsService);
         this.metaEventService = metaEventService;
     }
 

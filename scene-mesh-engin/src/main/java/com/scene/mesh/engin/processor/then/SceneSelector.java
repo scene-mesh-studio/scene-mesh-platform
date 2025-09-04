@@ -22,9 +22,6 @@ public class SceneSelector extends BaseProcessor {
     @Setter
     @Getter
     private ISceneService sceneService;
-    @Setter
-    @Getter
-    private String env;
 
     @Override
     protected boolean process(Object inputObject, IProcessInput input, IProcessOutput output) throws Exception {

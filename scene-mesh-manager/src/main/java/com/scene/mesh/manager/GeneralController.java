@@ -1,5 +1,6 @@
 package com.scene.mesh.manager;
 
+import com.scene.mesh.manager.dto.PageResult;
 import com.scene.mesh.manager.dto.SubmittedTaskDTO;
 import com.scene.mesh.manager.dto.VectorDTO;
 import com.scene.mesh.manager.task.IGeneralTask;
@@ -14,6 +15,7 @@ import com.scene.mesh.service.spec.terminal.ITerminalService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.ai.document.Document;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,12 +83,30 @@ public class GeneralController {
     }
 
     @GetMapping("/vectors")
-    public ResponseEntity<List<VectorDTO>> getVectorsByKnowledgeId(@RequestParam String knowledgeBaseId, @RequestParam String knowledgeItemId, @RequestParam String providerName, @RequestParam String modelName) {
-        List<Document> documents = this.embeddingService.findVectors(knowledgeBaseId, knowledgeItemId, providerName, modelName);
+    public ResponseEntity<PageResult<VectorDTO>> getVectorsByKnowledgeId(
+            @RequestParam String knowledgeBaseId,
+            @RequestParam String knowledgeItemId,
+            @RequestParam String providerName,
+            @RequestParam String modelName,
+            @RequestParam int page,
+            @RequestParam int size) {
+        if (page <= 0 || size <= 0) {
+            page = 1;
+            size = 10;
+        }
+
+        // 获取总数
+        long total = embeddingService.findCount(knowledgeBaseId, knowledgeItemId, providerName, modelName);
+        if (total <= 0) {
+            return ResponseEntity.ok(new PageResult<>(new ArrayList<>(),0,page,size));
+        }
+
+        List<Document> documents = this.embeddingService.findVectors(
+                knowledgeBaseId, knowledgeItemId, providerName, modelName, page, size);
 
         List<VectorDTO> vectorDTOS = new ArrayList<>();
         if (documents == null || documents.isEmpty())
-            return ResponseEntity.ok(vectorDTOS);
+            return ResponseEntity.ok(new PageResult<>(new ArrayList<>(),0,page,size));
 
         documents.forEach(document -> {
             VectorDTO vectorDTO = new VectorDTO();
@@ -95,7 +115,7 @@ public class GeneralController {
             vectorDTOS.add(vectorDTO);
         });
 
-        return ResponseEntity.ok(vectorDTOS);
+        return ResponseEntity.ok(new PageResult<>(vectorDTOS,total,page,size));
     }
 
     @DeleteMapping("/vectors")

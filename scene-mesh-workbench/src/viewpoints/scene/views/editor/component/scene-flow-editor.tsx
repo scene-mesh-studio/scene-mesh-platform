@@ -116,12 +116,13 @@ const nodeTemplateCatalogs: FlowNodeTemplateCatalog[] = [
         title: "大模型处理",
         description: "通过大语言模型进行事件处理",
         icon: "material-icon-theme:robots",
-        nodeType: "LLM_INFERENCE",
+        nodeType: "LLM_INFERENCE", 
         initParas: {
           name: "大模型处理",
           label: "大模型处理",
           type: "LLM_INFERENCE",
           modelProvider: "openai",
+          knowledgeBases: [],
           model: "gpt-3.5-turbo",
           promptTemplate: "",
           promptVariables: [],
@@ -175,6 +176,8 @@ type InnerSceneDesignFlowEditorProps = SceneFlowEditorProps & {};
 
 function InnerSceneDesignFlowEditor(props: InnerSceneDesignFlowEditorProps) {
   const { scene, product } = props;
+  console.log(`====sceneId: ${scene.id}`);
+  console.log(`=====productId: ${product.id}`);
   useMasterDetailViewContainer();
   const engine = useEntityEngine();
   const [nodes, setNodes] = useNodesState<SceneFlowNode>([]);

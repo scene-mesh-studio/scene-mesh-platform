@@ -9,6 +9,7 @@ import com.scene.mesh.engin.processor.then.operator.ThenOperatorManager;
 import com.scene.mesh.foundation.spec.message.IMessageConsumer;
 import com.scene.mesh.foundation.spec.message.IMessageProducer;
 import com.scene.mesh.model.event.Event;
+import com.scene.mesh.service.spec.ai.advisor.IAdvisorFactory;
 import com.scene.mesh.service.spec.ai.config.ILLmConfigService;
 import com.scene.mesh.service.spec.ai.mcp.IToolsService;
 import com.scene.mesh.service.spec.event.IMetaEventService;
@@ -59,10 +60,6 @@ public class EnginConfig {
     @Value("${scene-mesh.infrastructure.flink-web.port}")
     private String webPort;
 
-    // 环境和主题配置
-    @Value("${scene-mesh.environment.name}")
-    private String environment;
-
     @Value("${scene-mesh.topics.inbound-events}")
     private String inboundEventsTopic;
 
@@ -98,8 +95,8 @@ public class EnginConfig {
     @Bean
     public AgentThenOperator agentThenOperator(ILLmConfigService llmConfigService,
                                                IToolsService toolsService,
-                                               IMetaEventService metaEventService) {
-        return new AgentThenOperator(llmConfigService, toolsService, metaEventService);
+                                               IMetaEventService metaEventService, IAdvisorFactory advisorFactory) {
+        return new AgentThenOperator(llmConfigService, toolsService, metaEventService, advisorFactory);
     }
 
     @Bean
@@ -113,12 +110,11 @@ public class EnginConfig {
         return new ThenOperatorManager(List.of(agentThenOperator, nonAgentThenOperator));
     }
 
-    // ===== When Graph 组件 =====
+    // ===== When Graph component =====
 
     @Bean(name = "scene-event-producer")
     public EventProducer sceneEventProducer(IMessageConsumer messageConsumer) throws ClassNotFoundException {
         EventProducer producer = new EventProducer();
-        producer.setEnv(environment);
         producer.setMessageClass((Class<Event>) Class.forName(eventMessageClass));
         producer.setMessageConsumer(messageConsumer);
         producer.setTopicName(inboundEventsTopic);
@@ -133,12 +129,11 @@ public class EnginConfig {
         return sinker;
     }
 
-    // ===== Then Graph 组件 =====
+    // ===== Then Graph component =====
 
     @Bean(name = "matched-scene-producer")
     public MatchedSceneProducer matchedSceneProducer(IMessageConsumer messageConsumer) throws ClassNotFoundException {
         MatchedSceneProducer producer = new MatchedSceneProducer();
-        producer.setEnv(environment);
         producer.setMessageClass((Class<SceneMatchedResult>) Class.forName(sceneMatchedResultClass));
         producer.setMessageConsumer(messageConsumer);
         producer.setTopicName(matchedResultTopic);
@@ -148,7 +143,6 @@ public class EnginConfig {
     @Bean(name = "scene-selector")
     public SceneSelector sceneSelector(MutableCacheService mutableCacheService, ISceneService sceneService) throws ClassNotFoundException {
         SceneSelector selector = new SceneSelector();
-        selector.setEnv(environment);
         selector.setCacheService(mutableCacheService);
         selector.setSceneService(sceneService);
         return selector;
@@ -167,10 +161,10 @@ public class EnginConfig {
         return sinker;
     }
 
-    // ======== cache scheduler
+    // ======== cache scheduler component =====
     @Bean(name = "cron-trigger")
     public CacheTrigger cacheTrigger(){
-        return new CacheTrigger(Duration.ofSeconds(20));
+        return new CacheTrigger(Duration.ofSeconds(60));
     }
 
     @Bean(name = "cache-processor")

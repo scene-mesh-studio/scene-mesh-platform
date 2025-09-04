@@ -53,7 +53,7 @@ const convertNode = (
     window: patternData.window || null,
     untilCondition: null,
     afterMatchSkipStrategy: {
-      type: "SKIP_TILL_NEXT",
+      type: "SKIP_PAST_LAST_EVENT",
       patternName: null,
     },
     graph: null,

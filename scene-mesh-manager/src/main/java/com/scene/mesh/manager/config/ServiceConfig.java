@@ -25,11 +25,23 @@ import javax.sql.DataSource;
 @Configuration
 public class ServiceConfig {
 
-    @Value("${sm.redis.host}")
+    @Value("${scene-mesh.infrastructure.redis.host}")
     private String redisHost;
 
-    @Value("${sm.redis.port}")
+    @Value("${scene-mesh.infrastructure.redis.port}")
     private int redisPort;
+
+    @Value("${scene-mesh.ai.vector.store.url}")
+    private String vectorStoreUrl;
+
+    @Value("${scene-mesh.ai.vector.store.username}")
+    private String vectorStoreUsername;
+
+    @Value("${scene-mesh.ai.vector.store.password}")
+    private String vectorStorePassword;
+
+    @Value("${scene-mesh.ai.vector.store.driver}")
+    private String vectorStoreDriver;
 
     @Bean
     public ITerminalService terminalService(TerminalRepository terminalRepository){
@@ -65,12 +77,14 @@ public class ServiceConfig {
 
     @Bean
     public IVectorStoreFactory vectorStoreFactory(ILLmConfigService lLmConfigService){
+
         HikariConfig config = new HikariConfig();
 
         // 数据库连接配置
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/compute");
-        config.setUsername("sm");
-        config.setPassword("scene_mesh");
+        config.setJdbcUrl(vectorStoreUrl);
+        config.setUsername(vectorStoreUsername);
+        config.setPassword(vectorStorePassword);
+        config.setDriverClassName(vectorStoreDriver);
 
         // 连接池配置
         config.setMaximumPoolSize(20);

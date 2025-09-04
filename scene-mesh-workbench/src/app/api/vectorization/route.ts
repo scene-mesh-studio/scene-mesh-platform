@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
     const knowledgeItemId = searchParams.get('knowledgeItemId');
     const providerName = searchParams.get('providerName');
     const modelName = searchParams.get('modelName');
+    const page = searchParams.get('page');
+    const size = searchParams.get('size');
 
     const computeServerBaseUrl = process.env.COMPUTE_SERVER_BASE_URL;
     const computeServerVectorizationFindApi = process.env.COMPUTE_SERVER_VECTORIZATION_FIND_API;
@@ -43,7 +45,9 @@ export async function GET(request: NextRequest) {
         knowledgeBaseId: knowledgeBaseId || '',
         knowledgeItemId: knowledgeItemId || '',
         providerName: providerName || '',
-        modelName: modelName || ''
+        modelName: modelName || '',
+        page: page || '',
+        size: size || ''
     });
         
     try {

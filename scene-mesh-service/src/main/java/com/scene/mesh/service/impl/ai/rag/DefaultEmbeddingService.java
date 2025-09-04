@@ -91,7 +91,19 @@ public class DefaultEmbeddingService implements IEmbeddingService {
     }
 
     @Override
-    public List<Document> findVectors(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName) {
+    public Long findCount(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName) {
+        ExtendedPgVectorStore vectorStore = (ExtendedPgVectorStore) this.vectorStoreFactory.getVectorStore(providerName, modelName);
+        if (vectorStore == null) {
+            return 0L;
+        }
+        FilterExpressionBuilder feb = new FilterExpressionBuilder();
+        Filter.Expression findExpress = feb.and(new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_BASE_ID, knowledgeBaseId),
+                new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_ITEM_ID, knowledgeItemId)).build();
+        return vectorStore.countVectors(findExpress);
+    }
+
+    @Override
+    public List<Document> findVectors(String knowledgeBaseId, String knowledgeItemId, String providerName, String modelName, int page, int size) {
         ExtendedPgVectorStore vectorStore = (ExtendedPgVectorStore) this.vectorStoreFactory.getVectorStore(providerName, modelName);
         if (vectorStore == null) {
             return new ArrayList<>();
@@ -99,7 +111,12 @@ public class DefaultEmbeddingService implements IEmbeddingService {
         FilterExpressionBuilder feb = new FilterExpressionBuilder();
         Filter.Expression findExpress = feb.and(new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_BASE_ID, knowledgeBaseId),
                 new FilterExpressionBuilder().eq(META_PARAM_KNOWLEDGE_ITEM_ID, knowledgeItemId)).build();
-        return vectorStore.findVectors(findExpress);
+
+        // 计算偏移量
+        int offset = (page - 1) * size;
+
+        // 调用分页查询方法
+        return vectorStore.findVectors(findExpress, offset, size);
     }
 
     @Override

@@ -152,7 +152,10 @@ export const models: IEntityModel[] = [
     title: "产品设置",
     description: "产品设置",
     fields: [
-      { name: "secret", title: "秘钥", type: "string", isRequired: false },
+      { name: "secret",
+        title: "秘钥", 
+        type: "string", 
+        isRequired: true },
       {
         name: "mqttEnabled",
         title: "启用MQTT",
@@ -160,24 +163,10 @@ export const models: IEntityModel[] = [
         isRequired: true,
       },
       {
-        name: "mqttPort",
-        title: "MQTT端口",
-        type: "number",
-        isRequired: false,
-        defaultValue: 1883,
-      },
-      {
         name: "webSocketEnabled",
         title: "启用WebSocket",
         type: "boolean",
         isRequired: true,
-      },
-      {
-        name: "webSocketPort",
-        title: "WebSocket端口",
-        type: "number",
-        isRequired: false,
-        defaultValue: 8080,
       },
     ],
   },
@@ -411,39 +400,10 @@ export const models: IEntityModel[] = [
         defaultValue: true,
       },
       {
-        name: "timeWindow",
-        title: "时间窗口",
-        description: "设置为0时不起用,单位:秒",
-        type: "number",
-        isRequired: false,
-        defaultValue: 300,
-      },
-      {
-        name: "promptInherited",
-        title: "提示词继承类型(LLM)",
-        type: "enum",
-        typeOptions: {
-          options: [
-            { value: "inherit", label: "继承父场景提示词" },
-            { value: "overwrite", label: "不继承父场景提示词" },
-          ],
-        },
-        isRequired: true,
-        searchable: true,
-        defaultValue: "inherit",
-      },
-      {
         name: "prompt",
         title: "提示词(LLM)",
         type: "string",
         isRequired: true,
-      },
-      {
-        name: "input",
-        title: "输入(LLM)",
-        type: "string",
-        isRequired: false,
-        defaultValue: "",
       },
       { name: "rules", title: "规则", type: "json" },
       { name: "flow", title: "流程设计", type: "string" },
@@ -585,11 +545,8 @@ export const views: IEntityView[] = [
     items: [
       { name: "name", title: "名称", spanCols: 12 },
       { name: "description", title: "说明", spanCols: 12, flex: 1 },
-      { name: "timeWindow", title: "时间窗口", spanCols: 12 },
       { name: "enable", title: "启用", spanCols: 12 },
-      { name: "promptInherited", title: "提示词继承类型", spanCols: 12 },
       { name: "prompt", title: "提示词", spanCols: 12 },
-      { name: "input", title: "输入", spanCols: 12 },
     ],
   },
   {
@@ -602,11 +559,8 @@ export const views: IEntityView[] = [
     items: [
       { name: "name", title: "名称", spanCols: 12 },
       { name: "description", title: "说明", spanCols: 12, flex: 1 },
-      { name: "timeWindow", title: "时间窗口", spanCols: 12 },
       { name: "enable", title: "启用", spanCols: 12 },
-      { name: "promptInherited", title: "提示词继承类型", spanCols: 12 },
       { name: "prompt", title: "提示词", spanCols: 12 },
-      { name: "input", title: "输入", spanCols: 12 },
       {
         name: "children",
         title: "子场景",
@@ -626,11 +580,8 @@ export const views: IEntityView[] = [
     items: [
       { name: "name", title: "名称", spanCols: 12 },
       { name: "description", title: "说明", spanCols: 12, flex: 1 },
-      { name: "timeWindow", title: "时间窗口", spanCols: 12 },
       { name: "enable", title: "启用", spanCols: 12 },
-      { name: "promptInherited", title: "提示词继承类型", spanCols: 12 },
       { name: "prompt", title: "提示词", spanCols: 12 },
-      { name: "input", title: "输入", spanCols: 12 },
     ],
   },
   {
@@ -685,6 +636,7 @@ export const views: IEntityView[] = [
                     modelName: "scene",
                     viewType: "form",
                     viewName: "sceneFormViewSimple",
+                    mode: "edit",
                   },
                 },
               },
@@ -853,7 +805,7 @@ export const views: IEntityView[] = [
         widget: "number",
         spanCols: 12,
       },
-      { name: "feature", title: "模型特性", spanCols: 12 },
+      { name: "feature", title: "模型特性", spanCols: 12},
     ],
   },
   {
@@ -864,21 +816,9 @@ export const views: IEntityView[] = [
     viewType: "form",
     density: "medium",
     items: [
-      { name: "secret", title: "密钥", widget: "secret", spanCols: 12 },
+      { name: "secret", title: "密钥", widget: "textfield", spanCols: 12 },
       { name: "mqttEnabled", title: "启用MQTT", spanCols: 12 },
-      {
-        name: "mqttPort",
-        title: "MQTT端口",
-        spanCols: 12,
-        showWhen: "mqttEnabled",
-      },
       { name: "webSocketEnabled", title: "启用WebSocket", spanCols: 12 },
-      {
-        name: "webSocketPort",
-        title: "WebSocket端口",
-        spanCols: 12,
-        showWhen: "webSocketEnabled",
-      },
     ],
   },
   {
@@ -1086,7 +1026,7 @@ export const views: IEntityView[] = [
                 icon: "streamline-plump-color:information-circle",
                 widgetOptions: {
                   actionType: "view",
-                  payload: { modelName: "product", viewType: "form" },
+                  payload: { modelName: "product", viewType: "form", mode: "edit"  },
                 },
               },
               {
@@ -1101,6 +1041,7 @@ export const views: IEntityView[] = [
                     fromFieldName: "settings",
                     toModelName: "productSetting",
                     viewType: "form",
+                    mode: "edit"
                   },
                 },
               },
@@ -1155,29 +1096,14 @@ export const views: IEntityView[] = [
                 icon: "streamline-plump-color:align-selection",
                 widget: "action",
                 widgetOptions: {
-                  actionType: "view",
+                  actionType: 'reference-view',
                   payload: {
-                    // fromFieldName: "rootScene",
-                    // toModelName: "scene",
-                    // viewType: "mastail",
-                    // viewName: "sceneMastailView",
-                    modelName: "scene",
-                    viewType: "mastail",
-                    viewName: "sceneMastailView",
+                    fromFieldName: 'rootScene',
+                    toModelName: 'scene',
+                    viewType: 'mastail',
                   },
                 },
               },
-              // {
-              //   name: 'sceneGraph',
-              //   title: '场景视图',
-              //   spanCols: 12,
-              //   icon: 'material-icon-theme:webpack',
-              //   widget: 'action',
-              //   widgetOptions: {
-              //     actionType: 'comp',
-              //     payload: { comp: SceneDesignHomeView },
-              //   },
-              // },
             ],
           },
           {
@@ -1198,24 +1124,24 @@ export const views: IEntityView[] = [
               },
             ],
           },
-          {
-            name: "llm",
-            title: "AI",
-            icon: "ci:line-l",
-            fields: [
-              {
-                name: "tools",
-                title: "工具模型",
-                spanCols: 12,
-                icon: "streamline-plump-color:module",
-                widget: "action",
-                widgetOptions: {
-                  actionType: "view",
-                  payload: { modelName: "product", viewType: "grid" },
-                },
-              },
-            ],
-          },
+          // {
+          //   name: "llm",
+          //   title: "AI",
+          //   icon: "ci:line-l",
+          //   fields: [
+          //     {
+          //       name: "tools",
+          //       title: "工具模型",
+          //       spanCols: 12,
+          //       icon: "streamline-plump-color:module",
+          //       widget: "action",
+          //       widgetOptions: {
+          //         actionType: "view",
+          //         payload: { modelName: "product", viewType: "grid" },
+          //       },
+          //     },
+          //   ],
+          // },
         ],
       },
       {
@@ -1273,6 +1199,7 @@ export const views: IEntityView[] = [
                   payload: {
                     modelName: "intelligentModelProvider",
                     viewType: "form",
+                    viewName: "intelligentModelProviderFormView",
                     mode: "edit",
                   },
                 },
@@ -1433,13 +1360,13 @@ export const views: IEntityView[] = [
                 },
               },
               {
-                name: "data-overview",
-                title: "数据概览",
+                name: 'data-overview',
+                title: '数据概览',
                 icon: "streamline-plump-color:arrow-expand",
-                widget: "action",
+                widget: 'action',
                 widgetOptions: {
-                  actionType: "route",
-                  payload: { path: "/dashboard/data-overview" },
+                  actionType: 'view',
+                  payload: { modelName: '__default__', viewType: 'dashboard' },
                 },
               },
             ],
@@ -1833,5 +1760,107 @@ export const views: IEntityView[] = [
       { name: "minChunkLengthToEmbed", title: "最小丢弃长度(char)", spanCols: 6, flex: 1 },
       { name: "maxNumChunks", title: "最大分块数量(char)", spanCols: 6, flex: 1 },
     ],
-  }
+  },
+  {
+    name: 'dashboardView',
+    title: '仪表盘视图',
+    description: '仪表盘视图',
+    modelName: '__default__',
+    viewType: 'dashboard',
+    viewOptions: {},
+    items: [
+      {
+        name: 'dashboard',
+        title: '仪表盘',
+        description: '仪表盘视图',
+        widget: 'banner',
+        widgetOptions: {
+          items: [
+            {
+              title: '智能实时数据处理平台',
+              subtitle: '物联网 大数据 AI',
+              action: 'view::product::grid',
+              color: '#fff',
+              image:
+                'https://images.pexels.com/photos/1089438/pexels-photo-1089438.jpeg?_gl=1*phdriz*_ga*NzQzMDgyNjQzLjE3NTY4MTAxODc.*_ga_8JE65Q40S6*czE3NTY4MTAxODckbzEkZzEkdDE3NTY4MTA1NTgkajM3JGwwJGgw',
+            },
+            {
+              title: '智能边缘计算平台',
+              subtitle: '边缘计算 AI',
+              color: '#fff',
+              image:
+                'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?_gl=1*1w6neq1*_ga*NzQzMDgyNjQzLjE3NTY4MTAxODc.*_ga_8JE65Q40S6*czE3NTY4MTAxODckbzEkZzEkdDE3NTY4MTA1OTAkajUkbDAkaDA.',
+            },
+            {
+              title: '智能云计算平台',
+              subtitle: '云计算 AI',
+              color: '#fff',
+              image:
+                'https://images.pexels.com/photos/373543/pexels-photo-373543.jpeg?_gl=1*169k9e2*_ga*NzQzMDgyNjQzLjE3NTY4MTAxODc.*_ga_8JE65Q40S6*czE3NTY4MTAxODckbzEkZzEkdDE3NTY4MTA2MjkkajQ0JGwwJGgw',
+            },
+          ],
+        },
+        spanCols: 8,
+      },
+      {
+        name: 'chart',
+        title: '产品数量',
+        spanCols: 4,
+        icon: 'material-icon-theme:chart-line',
+        widget: 'statcard',
+        widgetOptions: {
+          value: 1242,
+          growth: -0.17,
+          modelName: 'product',
+          query: { pageSize: 5, pageIndex: 1 },
+        },
+      },
+      {
+        name: 'chart',
+        title: '终端数量',
+        spanCols: 4,
+        icon: 'material-icon-theme:chart-line',
+        widget: 'statcard',
+        widgetOptions: {
+          value: 1324,
+          growth: 0.25,
+          icon: 'flat-color-icons:electrical-sensor',
+        },
+      },
+      {
+        name: 'chart',
+        title: '事件处理量',
+        spanCols: 4,
+        icon: 'material-icon-theme:chart-line',
+        widget: 'statcard',
+        widgetOptions: {
+          value: 189209,
+          growth: 0.09,
+          icon: 'flat-color-icons:heat-map',
+        },
+      },
+      {
+        name: 'chart',
+        title: '下发动作量',
+        spanCols: 4,
+        icon: 'material-icon-theme:chart-line',
+        widget: 'statcard',
+        widgetOptions: {
+          value: 4630,
+          growth: -0.17,
+          icon: 'flat-color-icons:multiple-inputs',
+        },
+      },
+      {
+        name: 'datalist',
+        title: '活跃产品列表',
+        spanCols: 12,
+        icon: 'material-icon-theme:chart-line',
+        widget: 'datalist',
+        widgetOptions: {
+          modelName: 'product',
+        },
+      },
+    ],
+  },
 ];

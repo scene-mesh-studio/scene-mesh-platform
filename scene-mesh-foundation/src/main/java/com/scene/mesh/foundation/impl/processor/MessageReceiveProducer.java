@@ -27,9 +27,6 @@ public class MessageReceiveProducer<T> extends BaseProcessor {
     @Getter
     @Setter
     private Class<T> messageClass;
-    @Setter
-    @Getter
-    private String env;
 
     public void setTopicName(String topicName) {
         this.topicName = topicName;

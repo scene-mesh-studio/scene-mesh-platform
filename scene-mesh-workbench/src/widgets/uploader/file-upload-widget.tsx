@@ -9,7 +9,7 @@ export function FileUploadCompWrapper(props: EntityWidgetProps) {
     const engine = useEntityEngine();
 
     const accept = field.widgetOptions?.accept || '*/*';
-    const maxSize = field.widgetOptions?.maxSize || 10 * 1024 * 1024; // 默认5MB
+    const maxSize = field.widgetOptions?.maxSize || 30 * 1024 * 1024; // 默认5MB
     const showInfo = field.widgetOptions?.showInfo ?? true; // 是否显示上传信息
 
     const handleFileUpload = async (file: File) => {

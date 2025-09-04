@@ -2,8 +2,8 @@ spring:
   application:
     name: scene-mesh-facade
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
+    url: jdbc:postgresql://127.0.0.1:5432/compute
+    username: sm
     password: scene_mesh
     driver-class-name: org.postgresql.Driver
     hikari:
