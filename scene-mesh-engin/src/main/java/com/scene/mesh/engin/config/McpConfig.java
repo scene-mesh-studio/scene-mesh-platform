@@ -1,5 +1,6 @@
 package com.scene.mesh.engin.config;
 
+import com.scene.mesh.foundation.impl.component.SpringApplicationContextUtils;
 import com.scene.mesh.model.mcp.McpServer;
 import com.scene.mesh.service.impl.ai.mcp.ToolCallbackProviderManager;
 import com.scene.mesh.service.impl.ai.mcp.ToolCallbackProviderWithId;
@@ -32,6 +33,18 @@ public class McpConfig {
     private String mcpServerUrl;
 
     private ToolCallbackProviderWithId actionToolCallbackProvider() {
+    // 保存当前线程的上下文类加载器
+    ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+    
+    try {
+        // 设置 Spring 应用上下文的类加载器
+        ClassLoader springClassLoader = SpringApplicationContextUtils.class.getClassLoader();
+        Thread.currentThread().setContextClassLoader(springClassLoader);
+        
+        log.info("Setting context classloader for MCP client: {}@{}", 
+                springClassLoader.getClass().getName(), 
+                Integer.toHexString(springClassLoader.hashCode()));
+        
         // 创建 SSE 传输层
         WebClient.Builder webClientBuilder = WebClient.builder()
                 .baseUrl(mcpServerUrl)
@@ -42,24 +55,35 @@ public class McpConfig {
                 .builder(webClientBuilder)
                 .sseEndpoint("/sse")
                 .build();
-        try {
-            McpSyncClient mcpClient = McpClient.sync(transport).build();
-            mcpClient.initialize();
-            return new ToolCallbackProviderWithId("action", mcpClient);
-        } catch (Exception e) {
-            log.error("Failed to initialize Scene Mesh MCP client", e);
-            return null;
-        }
+        
+        McpSyncClient mcpClient = McpClient.sync(transport)
+                .build();
+        mcpClient.initialize();
+        return new ToolCallbackProviderWithId("action", mcpClient);
+        
+    } catch (Exception e) {
+        log.error("Failed to initialize Scene Mesh MCP client", e);
+        return null;
+    } finally {
+        // 恢复原始类加载器
+        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
     }
+}
 
-    private List<ToolCallbackProvider> realToolCallbackProviders(IMcpServerService mcpServerService) {
+private List<ToolCallbackProvider> realToolCallbackProviders(IMcpServerService mcpServerService) {
+    List<McpServer> mcpServers = mcpServerService.getAllMcpServers();
+    if (mcpServers == null || mcpServers.isEmpty()) return new ArrayList<>();
 
-        List<McpServer> mcpServers = mcpServerService.getAllMcpServers();
-        if (mcpServers == null || mcpServers.isEmpty()) return new ArrayList<>();
-
+    // 保存当前线程的上下文类加载器
+    ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
+    
+    try {
+        // 设置 Spring 应用上下文的类加载器
+        ClassLoader springClassLoader = SpringApplicationContextUtils.class.getClassLoader();
+        Thread.currentThread().setContextClassLoader(springClassLoader);
+        
         List<ToolCallbackProvider> toolCallbackProviders = new ArrayList<>();
         for (McpServer mcpServer : mcpServers) {
-
             McpClientTransport transport = null;
 
             if ("sse".equals(mcpServer.getType())) {
@@ -95,7 +119,11 @@ public class McpConfig {
         }
 
         return toolCallbackProviders;
+    } finally {
+        // 恢复原始类加载器
+        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
     }
+}
 
     @Bean
     public ToolCallbackProviderManager sceneMeshToolCallbackProvider(IMcpServerService mcpServerService) {

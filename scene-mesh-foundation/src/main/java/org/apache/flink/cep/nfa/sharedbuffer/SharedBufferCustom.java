@@ -20,6 +20,8 @@ package org.apache.flink.cep.nfa.sharedbuffer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.annotation.VisibleForTesting;
+
+import java.lang.reflect.Constructor;
 import org.apache.flink.api.common.state.KeyedStateStore;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
@@ -65,7 +67,7 @@ import java.util.*;
  * https://people.cs.umass.edu/~yanlei/publications/sase-sigmod08.pdf</a>
  */
 @Slf4j
-public class SharedBuffer<V> {
+public class SharedBufferCustom<V> extends SharedBuffer<V> {
 
     private static final String LEGACY_ENTRIES_STATE_NAME = "sharedBuffer-entries";
     private static final String ENTRIES_STATE_NAME = "sharedBuffer-entries-with-lockable-edges";
@@ -93,14 +95,15 @@ public class SharedBuffer<V> {
     private final Timer cacheStatisticsTimer;
 
     @VisibleForTesting
-    public SharedBuffer(KeyedStateStore stateStore, TypeSerializer<V> valueSerializer) {
+    public SharedBufferCustom(KeyedStateStore stateStore, TypeSerializer<V> valueSerializer) {
         this(stateStore, valueSerializer, new SharedBufferCacheConfig());
     }
 
-    public SharedBuffer(
+    public SharedBufferCustom(
             KeyedStateStore stateStore,
             TypeSerializer<V> valueSerializer,
             SharedBufferCacheConfig cacheConfig) {
+        super(stateStore, valueSerializer);
         this.eventsBuffer =
                 stateStore.getMapState(
                         new MapStateDescriptor<>(
@@ -261,7 +264,57 @@ public class SharedBuffer<V> {
      * @return an accessor to deal with this sharedBuffer.
      */
     public SharedBufferAccessor<V> getAccessor() {
-        return new SharedBufferAccessor<>(this);
+        try {
+            log.info("=== 开始创建 SharedBufferAccessor ===");
+            log.info("当前类加载器: {}", this.getClass().getClassLoader());
+            log.info("SharedBufferAccessor 类加载器: {}", SharedBufferAccessor.class.getClassLoader());
+            log.info("SharedBuffer 类加载器: {}", SharedBuffer.class.getClassLoader());
+            
+            // 检查类是否存在
+            Class<?> accessorClass = SharedBufferAccessor.class;
+            log.info("SharedBufferAccessor 类存在: {}", accessorClass.getName());
+            
+            // 检查构造函数
+            java.lang.reflect.Constructor<?>[] constructors = accessorClass.getDeclaredConstructors();
+            log.info("SharedBufferAccessor 构造函数数量: {}", constructors.length);
+            for (int i = 0; i < constructors.length; i++) {
+                java.lang.reflect.Constructor<?> constructor = constructors[i];
+                log.info("构造函数[{}]: 参数数量={}, 修饰符={}, 是否可访问={}", 
+                    i, constructor.getParameterCount(), 
+                    java.lang.reflect.Modifier.toString(constructor.getModifiers()),
+                    constructor.isAccessible());
+            }
+            
+            // 尝试使用反射创建实例（绕过类加载器隔离）
+            log.info("尝试使用反射创建 SharedBufferAccessor 实例...");
+            
+            // 使用反射绕过访问权限限制
+            Constructor<SharedBufferAccessor> constructor = SharedBufferAccessor.class.getDeclaredConstructor(SharedBuffer.class);
+            constructor.setAccessible(true); // 绕过访问权限检查
+            
+            SharedBufferAccessor<V> accessor = constructor.newInstance(this);
+            log.info("=== SharedBufferAccessor 创建成功 ===");
+            return accessor;
+            
+        } catch (NoClassDefFoundError e) {
+            log.error("=== 类找不到错误 ===");
+            log.error("错误类型: NoClassDefFoundError");
+            log.error("错误信息: {}", e.getMessage());
+            log.error("堆栈跟踪:", e);
+            throw e;
+        } catch (IllegalAccessError e) {
+            log.error("=== 访问权限错误 ===");
+            log.error("错误类型: IllegalAccessError");
+            log.error("错误信息: {}", e.getMessage());
+            log.error("堆栈跟踪:", e);
+            throw e;
+        } catch (Exception e) {
+            log.error("=== 其他错误 ===");
+            log.error("错误类型: {}", e.getClass().getSimpleName());
+            log.error("错误信息: {}", e.getMessage());
+            log.error("堆栈跟踪:", e);
+            throw new RuntimeException("Failed to create SharedBufferAccessor", e);
+        }
     }
 
     void advanceTime(long timestamp) throws Exception {
@@ -407,7 +460,6 @@ public class SharedBuffer<V> {
 
 
     public void clear() {
-        eventsBuffer.clear();
         eventsBuffer.clear();
         entries.clear();
     }

@@ -6,6 +6,7 @@ import com.scene.mesh.engin.processor.cache.CacheTrigger;
 import com.scene.mesh.engin.processor.then.operator.AgentThenOperator;
 import com.scene.mesh.engin.processor.then.operator.NonAgentThenOperator;
 import com.scene.mesh.engin.processor.then.operator.ThenOperatorManager;
+import com.scene.mesh.foundation.impl.component.SpringApplicationContextUtils;
 import com.scene.mesh.foundation.spec.message.IMessageConsumer;
 import com.scene.mesh.foundation.spec.message.IMessageProducer;
 import com.scene.mesh.model.event.Event;
@@ -46,10 +47,10 @@ public class EnginConfig {
             throw new RuntimeException("execute.env is null. Please set execute.env property.");
         }
         String ymlPath = "application-"+env+".yml";
+
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-        YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-        yaml.setResources(new ClassPathResource(ymlPath));
-        configurer.setProperties(Objects.requireNonNull(yaml.getObject()));
+        // 使用统一的资源加载方法
+        configurer.setProperties(SpringApplicationContextUtils.loadYamlProperties(ymlPath));
         return configurer;
     }
 

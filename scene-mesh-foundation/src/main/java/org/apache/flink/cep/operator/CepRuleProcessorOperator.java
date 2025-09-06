@@ -1,6 +1,8 @@
 package org.apache.flink.cep.operator;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.api.common.functions.util.FunctionUtils;
 import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
@@ -26,6 +28,7 @@ import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy;
 import org.apache.flink.cep.nfa.compiler.NFACompiler;
 import org.apache.flink.cep.nfa.sharedbuffer.SharedBuffer;
 import org.apache.flink.cep.nfa.sharedbuffer.SharedBufferAccessor;
+import org.apache.flink.cep.nfa.sharedbuffer.SharedBufferCustom;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.time.TimerService;
 import org.apache.flink.cep.types.RuleRowKey;
@@ -61,6 +64,7 @@ import java.util.stream.Stream;
  *
  * 
  */
+@Slf4j
 public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OUT>
         implements OneInputStreamOperator<EventRecord<IN>, OUT>,
         Triggerable<RuleRowKey<?>, VoidNamespace>,
@@ -109,9 +113,9 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
     private transient TimestampedCollector<OUT> collector;
 
     /**
-     * Wrapped RuntimeContext that limits the underlying context features.
+     * RuntimeContext for NFA operations.
      */
-    private transient CepRuntimeContext cepRuntimeContext;
+    private transient RuntimeContext cepRuntimeContext;
 
     /**
      * Thin context passed to NFA that gives access to time related characteristics.
@@ -153,7 +157,7 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
             StreamConfig config,
             Output<StreamRecord<OUT>> output) {
         super.setup(containingTask, config, output);
-        this.cepRuntimeContext = new CepRuntimeContext(getRuntimeContext());
+        this.cepRuntimeContext = getRuntimeContext();
     }
 
     @Override
@@ -430,7 +434,13 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
      * @param timestamp The timestamp of the event
      */
     private void processEvent(CepRuleProcessor processor, NFAState nfaState, IN event, long timestamp) throws Exception {
+        log.info("=== 开始处理事件 ===");
+        log.info("尝试获取 SharedBufferAccessor...");
+        
         try (SharedBufferAccessor<IN> sharedBufferAccessor = processor.partialMatches.getAccessor()) {
+            log.info("SharedBufferAccessor 获取成功，类型: {}", sharedBufferAccessor.getClass().getName());
+            log.info("SharedBufferAccessor 类加载器: {}", sharedBufferAccessor.getClass().getClassLoader());
+            
             Collection<Map<String, List<IN>>> patterns =
                     processor.nfa.process(
                             sharedBufferAccessor,
@@ -443,6 +453,12 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
                 registerTimer(timestamp + processor.nfa.getWindowTime());
             }
             processMatchedSequences(processor, patterns, timestamp);
+        } catch (Exception e) {
+            log.error("=== 处理事件时发生错误 ===");
+            log.error("错误类型: {}", e.getClass().getSimpleName());
+            log.error("错误信息: {}", e.getMessage());
+            log.error("堆栈跟踪:", e);
+            throw e;
         }
     }
 
@@ -564,7 +580,7 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
     public class CepRuleProcessor implements Serializable {
         private RuleUpdated rule;
         @Getter
-        private transient SharedBuffer<IN> partialMatches;
+        private transient SharedBufferCustom<IN> partialMatches;
         @Getter
         private transient Pattern<IN, ?> pattern;
         @Getter
@@ -594,7 +610,7 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
             if (partialMatches == null) {
                 try {
                     // 1. 初始化SharedBuffer
-                    partialMatches = new SharedBuffer<>(
+                    partialMatches = new SharedBufferCustom<>(
                             stateInitializationContext.getKeyedStateStore(),
                             inputSerializer,
                             SharedBufferCacheConfig.of(getOperatorConfig().getConfiguration()));

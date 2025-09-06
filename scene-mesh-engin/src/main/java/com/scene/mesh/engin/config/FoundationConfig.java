@@ -22,7 +22,7 @@ public class FoundationConfig {
     private String redisHost;
 
     @Value("${scene-mesh.infrastructure.redis.port}")
-    private String redisPort;
+    private int redisPort;
 
     @Value("${scene-mesh.infrastructure.message.batch-size}")
     private String batchSize;
@@ -50,7 +50,7 @@ public class FoundationConfig {
 
     @Bean
     public RedisCache iCache() {
-        return new RedisCache(redisHost, Integer.parseInt(redisPort));
+        return new RedisCache(redisHost, redisPort);
     }
 
     @Bean
@@ -58,7 +58,7 @@ public class FoundationConfig {
         RedisMessageConsumer consumer = new RedisMessageConsumer();
         consumer.setBatchSize(Integer.parseInt(batchSize));
         consumer.setHost(redisHost);
-        consumer.setPort(Integer.parseInt(redisPort));
+        consumer.setPort(redisPort);
         consumer.setTimeoutSeconds(Integer.parseInt(timeoutSeconds));
         consumer.setSerializer(new JsonMessageSerializer());
         consumer.__init__();
@@ -69,7 +69,7 @@ public class FoundationConfig {
     public RedisMessageProducer messageProducer() {
         RedisMessageProducer producer = new RedisMessageProducer();
         producer.setHost(redisHost);
-        producer.setPort(Integer.parseInt(redisPort));
+        producer.setPort(redisPort);
         producer.setSerializer(new JsonMessageSerializer());
         producer.__init__();
         return producer;
