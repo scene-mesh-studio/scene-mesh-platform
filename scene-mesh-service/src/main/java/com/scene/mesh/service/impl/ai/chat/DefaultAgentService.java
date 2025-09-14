@@ -84,7 +84,7 @@ public class DefaultAgentService implements IAgentService {
         }
         List<Advisor> advisors = this.advisorFactory.getMutableAdvisors(advisorsInput);
 
-        String userMessage = this.promptService.assembleUserMessage(templateResource, variables);
+        String userMessage = this.promptService.assemblePrompt(templateResource, variables);
         Prompt prompt = Prompt.builder()
                 .messages(new UserMessage(userMessage))
                 .build()

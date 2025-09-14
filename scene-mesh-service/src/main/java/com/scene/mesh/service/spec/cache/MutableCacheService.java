@@ -579,4 +579,8 @@ public class MutableCacheService {
     public KnowledgeBase getKnowledgeById(String kbId) {
         return this.knowledgeCacheContainerProvider.read().getKnowledge(kbId);
     }
+
+    public List<Product> getAllProducts() {
+        return this.productCacheContainer.read().getAllProducts();
+    }
 }

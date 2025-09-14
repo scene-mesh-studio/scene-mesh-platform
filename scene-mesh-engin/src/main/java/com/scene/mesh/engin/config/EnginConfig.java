@@ -17,6 +17,7 @@ import com.scene.mesh.service.spec.event.IMetaEventService;
 import com.scene.mesh.service.spec.scene.ISceneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Configuration;
 import com.scene.mesh.foundation.impl.component.SpringComponentProvider;
 import com.scene.mesh.foundation.impl.processor.execute.DefaultProcessManager;
@@ -172,4 +173,10 @@ public class EnginConfig {
     public CacheProcessor cacheProcessor(MutableCacheService mutableCacheService){
         return new CacheProcessor(mutableCacheService);
     }
+
+//    @Bean
+//    public ClientHttpRequestFactorySettings clientHttpRequestFactorySettings() {
+//        return new ClientHttpRequestFactorySettings(ClientHttpRequestFactorySettings.Redirects.FOLLOW_WHEN_POSSIBLE, Duration.ofSeconds(3),
+//                Duration.ofSeconds(10), null);
+//    }
 }

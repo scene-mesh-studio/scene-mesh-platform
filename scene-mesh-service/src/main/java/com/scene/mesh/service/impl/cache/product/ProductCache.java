@@ -24,4 +24,8 @@ public class ProductCache implements IDisposed {
     public void dispose() {
         this.cache.deleteByKeyPrefix(KEY_PREFIX + "*");
     }
+
+    public List<Product> getAllProducts() {
+        return this.cache.getAll(KEY_PREFIX + "*");
+    }
 }

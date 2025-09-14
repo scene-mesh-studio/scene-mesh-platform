@@ -265,35 +265,35 @@ public class SharedBufferCustom<V> extends SharedBuffer<V> {
      */
     public SharedBufferAccessor<V> getAccessor() {
         try {
-            log.info("=== 开始创建 SharedBufferAccessor ===");
-            log.info("当前类加载器: {}", this.getClass().getClassLoader());
-            log.info("SharedBufferAccessor 类加载器: {}", SharedBufferAccessor.class.getClassLoader());
-            log.info("SharedBuffer 类加载器: {}", SharedBuffer.class.getClassLoader());
+            log.debug("=== 开始创建 SharedBufferAccessor ===");
+            log.debug("当前类加载器: {}", this.getClass().getClassLoader());
+            log.debug("SharedBufferAccessor 类加载器: {}", SharedBufferAccessor.class.getClassLoader());
+            log.debug("SharedBuffer 类加载器: {}", SharedBuffer.class.getClassLoader());
             
             // 检查类是否存在
             Class<?> accessorClass = SharedBufferAccessor.class;
-            log.info("SharedBufferAccessor 类存在: {}", accessorClass.getName());
+            log.debug("SharedBufferAccessor 类存在: {}", accessorClass.getName());
             
             // 检查构造函数
             java.lang.reflect.Constructor<?>[] constructors = accessorClass.getDeclaredConstructors();
-            log.info("SharedBufferAccessor 构造函数数量: {}", constructors.length);
+            log.debug("SharedBufferAccessor 构造函数数量: {}", constructors.length);
             for (int i = 0; i < constructors.length; i++) {
                 java.lang.reflect.Constructor<?> constructor = constructors[i];
-                log.info("构造函数[{}]: 参数数量={}, 修饰符={}, 是否可访问={}", 
+                log.debug("构造函数[{}]: 参数数量={}, 修饰符={}, 是否可访问={}",
                     i, constructor.getParameterCount(), 
                     java.lang.reflect.Modifier.toString(constructor.getModifiers()),
                     constructor.isAccessible());
             }
             
             // 尝试使用反射创建实例（绕过类加载器隔离）
-            log.info("尝试使用反射创建 SharedBufferAccessor 实例...");
+            log.debug("尝试使用反射创建 SharedBufferAccessor 实例...");
             
             // 使用反射绕过访问权限限制
             Constructor<SharedBufferAccessor> constructor = SharedBufferAccessor.class.getDeclaredConstructor(SharedBuffer.class);
             constructor.setAccessible(true); // 绕过访问权限检查
             
             SharedBufferAccessor<V> accessor = constructor.newInstance(this);
-            log.info("=== SharedBufferAccessor 创建成功 ===");
+            log.debug("=== SharedBufferAccessor 创建成功 ===");
             return accessor;
             
         } catch (NoClassDefFoundError e) {

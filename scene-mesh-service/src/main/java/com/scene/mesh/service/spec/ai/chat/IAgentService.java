@@ -12,5 +12,4 @@ public interface IAgentService {
 
     boolean callAgent(WhenThen.Then agent, List<Event> inputEvents);
 
-
 }

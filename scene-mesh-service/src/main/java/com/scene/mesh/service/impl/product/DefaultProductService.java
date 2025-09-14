@@ -5,6 +5,8 @@ import com.scene.mesh.service.spec.cache.MutableCacheService;
 import com.scene.mesh.service.spec.product.IProductService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 @Slf4j
 public class DefaultProductService implements IProductService {
 
@@ -17,6 +19,11 @@ public class DefaultProductService implements IProductService {
     @Override
     public Product getProduct(String productId) {
         return mutableCacheService.getProductById(productId);
+    }
+
+    @Override
+    public List<Product> getProducts() {
+        return mutableCacheService.getAllProducts();
     }
 
     @Override

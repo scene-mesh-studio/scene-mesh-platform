@@ -5,6 +5,7 @@ import com.scene.mesh.model.mcp.McpServer;
 import com.scene.mesh.service.impl.ai.mcp.ToolCallbackProviderManager;
 import com.scene.mesh.service.impl.ai.mcp.ToolCallbackProviderWithId;
 import com.scene.mesh.service.spec.ai.mcp.IMcpServerService;
+import io.modelcontextprotocol.client.McpAsyncClient;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.WebClientStreamableHttpTransport;
@@ -45,7 +46,7 @@ public class McpConfig {
                 springClassLoader.getClass().getName(), 
                 Integer.toHexString(springClassLoader.hashCode()));
         
-        // 创建 SSE 传输层
+        // 创建 Streamable 传输层
         WebClient.Builder webClientBuilder = WebClient.builder()
                 .baseUrl(mcpServerUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -55,9 +56,8 @@ public class McpConfig {
                 .builder(webClientBuilder)
                 .sseEndpoint("/sse")
                 .build();
-        
-        McpSyncClient mcpClient = McpClient.sync(transport)
-                .build();
+
+        McpSyncClient mcpClient = McpClient.sync(transport).build();
         mcpClient.initialize();
         return new ToolCallbackProviderWithId("action", mcpClient);
         

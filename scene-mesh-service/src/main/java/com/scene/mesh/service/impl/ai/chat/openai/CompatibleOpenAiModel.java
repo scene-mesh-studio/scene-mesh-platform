@@ -1,12 +1,16 @@
 package com.scene.mesh.service.impl.ai.chat.openai;
 
 import com.scene.mesh.service.impl.ai.chat.BaseChatModel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
 
+@Slf4j
 public class CompatibleOpenAiModel extends BaseChatModel {
 
     private final String modelId;
@@ -21,7 +25,21 @@ public class CompatibleOpenAiModel extends BaseChatModel {
         this.modelId = modelId;
         this.modelName = modelName;
         this.provider = provider;
-        OpenAiApi openAiApi = OpenAiApi.builder().baseUrl(baseUrl).completionsPath(path).apiKey(apiKey).build();
+
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(3000); // 10秒连接超时
+        requestFactory.setReadTimeout(30000);    // 30秒读取超时
+
+        RestClient.Builder restClientBuilder = RestClient.builder()
+                .requestFactory(requestFactory);
+
+
+        OpenAiApi openAiApi = OpenAiApi.builder()
+                .baseUrl(baseUrl)
+                .completionsPath(path)
+                .restClientBuilder(restClientBuilder)
+                .apiKey(apiKey)
+                .build();
         OpenAiChatOptions chatOptions = OpenAiChatOptions.builder().model(modelName).build();
         this.openAiChatModel = OpenAiChatModel.builder().openAiApi(openAiApi).defaultOptions(chatOptions).build();
     }

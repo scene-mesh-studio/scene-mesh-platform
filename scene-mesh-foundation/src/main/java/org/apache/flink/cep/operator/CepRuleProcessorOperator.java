@@ -435,11 +435,11 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
      */
     private void processEvent(CepRuleProcessor processor, NFAState nfaState, IN event, long timestamp) throws Exception {
         log.info("=== 开始处理事件 ===");
-        log.info("尝试获取 SharedBufferAccessor...");
+        log.debug("尝试获取 SharedBufferAccessor...");
         
         try (SharedBufferAccessor<IN> sharedBufferAccessor = processor.partialMatches.getAccessor()) {
-            log.info("SharedBufferAccessor 获取成功，类型: {}", sharedBufferAccessor.getClass().getName());
-            log.info("SharedBufferAccessor 类加载器: {}", sharedBufferAccessor.getClass().getClassLoader());
+            log.debug("SharedBufferAccessor 获取成功，类型: {}", sharedBufferAccessor.getClass().getName());
+            log.debug("SharedBufferAccessor 类加载器: {}", sharedBufferAccessor.getClass().getClassLoader());
             
             Collection<Map<String, List<IN>>> patterns =
                     processor.nfa.process(

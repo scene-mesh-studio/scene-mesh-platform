@@ -1,6 +1,8 @@
 package com.scene.mesh.service.impl.ai.mcp;
 
+import io.modelcontextprotocol.client.McpAsyncClient;
 import io.modelcontextprotocol.client.McpSyncClient;
+import org.springframework.ai.mcp.AsyncMcpToolCallbackProvider;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 
 public class ToolCallbackProviderWithId extends SyncMcpToolCallbackProvider {

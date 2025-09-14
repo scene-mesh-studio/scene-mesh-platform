@@ -1,87 +1,126 @@
 {
-  "nodes": [
-    {
-      "name": "y0mb7nf5dhjeoqggnrgs4sek",
-      "type": "COMPOSITE",
-      "quantifier": {
-        "consumingStrategy": "STRICT",
-        "innerConsumingStrategy": "SKIP_TILL_NEXT",
-        "properties": [
-          "SINGLE"
-        ]
+  "@class": "com.scene.mesh.model.scene.Scene",
+  "id": "vnzvwnqpqjvq6hqlma2rlfmh",
+  "productId": "g5mqk3srlb8ikx2v602q7tj6",
+  "name": "文本对话场景",
+  "description": "文本对话场景",
+  "enable": true,
+  "whenThenList": [
+    "java.util.ArrayList",
+    [
+      {
+        "@class": "com.scene.mesh.model.scene.WhenThen",
+        "then": {
+          "@class": "com.scene.mesh.model.scene.WhenThen$Then",
+          "id": "b0241vpck2r4bdlgzbq0wka7",
+          "name": "大模型处理",
+          "label": "大模型处理",
+          "type": "LLM_INFERENCE",
+          "modelProvider": "智谱 AI",
+          "model": "glm-4.5-flash",
+          "promptTemplate": "",
+          "promptVariables": [],
+          "temperature": 0.7,
+          "topP": 1,
+          "mcps": [],
+          "knowledgeBases": [
+            "[Lcom.scene.mesh.model.scene.WhenThen$KnowledgeBase;",
+            [
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$KnowledgeBase",
+                "id": "mnsdc5o5o8zs7p23g273d5rf",
+                "priority": 1
+              }
+            ]
+          ],
+          "outputActions": [
+            "java.util.ArrayList",
+            [
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$OutputAction",
+                "actionId": "ulgneracrnc7m043qtq75efz",
+                "values": [
+                  "java.util.ArrayList",
+                  []
+                ]
+              },
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$OutputAction",
+                "actionId": "q5d4mvx5ny6sq5e433o884y6",
+                "values": [
+                  "java.util.ArrayList",
+                  []
+                ]
+              },
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$OutputAction",
+                "actionId": "azut597xjedlphxqf3dejfm0",
+                "values": [
+                  "java.util.ArrayList",
+                  []
+                ]
+              },
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$OutputAction",
+                "actionId": "axbyqsoi2fc3haam1tewje85",
+                "values": [
+                  "java.util.ArrayList",
+                  []
+                ]
+              },
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$OutputAction",
+                "actionId": "q77kz4sl64zrlrxzq965xi9q",
+                "values": [
+                  "java.util.ArrayList",
+                  []
+                ]
+              }
+            ]
+          ]
+        },
+        "when": "{\"nodes\":[{\"name\":\"cuz1tpd7pkagblexaqtqdymx\",\"type\":\"ATOMIC\",\"quantifier\":{\"consumingStrategy\":\"STRICT\",\"innerConsumingStrategy\":\"SKIP_TILL_NEXT\",\"properties\":[\"SINGLE\"]},\"condition\":{\"type\":\"AVIATOR\",\"expression\":\"type == 'chat_text'\"},\"times\":null,\"window\":null,\"untilCondition\":null,\"afterMatchSkipStrategy\":{\"type\":\"SKIP_PAST_LAST_EVENT\",\"patternName\":null},\"graph\":null}],\"edges\":[]}"
       },
-      "condition": null,
-      "times": null,
-      "window": {
-        "type": "FIRST_AND_LAST",
-        "time": {
-          "unit": "SECONDS",
-          "size": 60
-        }
-      },
-      "untilCondition": null,
-      "afterMatchSkipStrategy": {
-        "type": "SKIP_PAST_LAST_EVENT",
-        "patternName": null
-      },
-      "graph": {
-        "nodes": [
-          {
-            "name": "sycm6dw0ed6o0k7td50383yy",
-            "type": "ATOMIC",
-            "quantifier": {
-              "consumingStrategy": "STRICT",
-              "innerConsumingStrategy": "SKIP_TILL_NEXT",
-              "properties": [
-                "SINGLE"
-              ]
-            },
-            "condition": {
-              "type": "AVIATOR",
-              "expression": "event.type == wakeup_word"
-            },
-            "times": null,
-            "window": null,
-            "untilCondition": null,
-            "afterMatchSkipStrategy": {
-              "type": "SKIP_PAST_LAST_EVENT",
-              "patternName": null
-            },
-            "graph": null
-          },
-          {
-            "name": "m3zeddcc6cz5k13okty6n76x",
-            "type": "ATOMIC",
-            "quantifier": {
-              "consumingStrategy": "STRICT",
-              "innerConsumingStrategy": "SKIP_TILL_NEXT",
-              "properties": [
-                "SINGLE"
-              ]
-            },
-            "condition": {
-              "type": "AVIATOR",
-              "expression": "event.type == voice"
-            },
-            "times": null,
-            "window": null,
-            "untilCondition": null,
-            "afterMatchSkipStrategy": {
-              "type": "SKIP_PAST_LAST_EVENT",
-              "patternName": null
-            },
-            "graph": null
-          }
-        ],
-        "edges": [
-          {
-            "source": "sycm6dw0ed6o0k7td50383yy",
-            "target": "m3zeddcc6cz5k13okty6n76x",
-            "type": "SKIP_TILL_NEXT"
-          }
-        ]
+      {
+        "@class": "com.scene.mesh.model.scene.WhenThen",
+        "then": {
+          "@class": "com.scene.mesh.model.scene.WhenThen$Then",
+          "id": "vcd8hyf5zus3govmmvfsp409",
+          "name": "直接输出",
+          "label": "直接输出",
+          "type": "FORMAT_OUTPUT",
+          "modelProvider": null,
+          "model": null,
+          "promptTemplate": null,
+          "promptVariables": null,
+          "temperature": null,
+          "topP": null,
+          "mcps": null,
+          "knowledgeBases": null,
+          "outputActions": [
+            "java.util.ArrayList",
+            [
+              {
+                "@class": "com.scene.mesh.model.scene.WhenThen$OutputAction",
+                "actionId": "axbyqsoi2fc3haam1tewje85",
+                "values": [
+                  "java.util.ArrayList",
+                  [
+                    {
+                      "@class": "com.scene.mesh.model.scene.WhenThen$OutPutActionValue",
+                      "fieldName": "text",
+                      "value": "who are you"
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        },
+        "when": "{\"nodes\":[{\"name\":\"ldaedglqigo3immkknxje9g9\",\"type\":\"ATOMIC\",\"quantifier\":{\"consumingStrategy\":\"STRICT\",\"innerConsumingStrategy\":\"SKIP_TILL_NEXT\",\"properties\":[\"SINGLE\"]},\"condition\":{\"type\":\"AVIATOR\",\"expression\":\"type == 'chat_text'\"},\"times\":null,\"window\":null,\"untilCondition\":null,\"afterMatchSkipStrategy\":{\"type\":\"SKIP_PAST_LAST_EVENT\",\"patternName\":null},\"graph\":null}],\"edges\":[]}"
       }
-    }
+    ]
   ],
-  "edges": []
+  "flowDataPublishTime": "2025-09-11T04:25:58.871Z",
+  "prompt": "当前对话场景基于星宝玩具，该玩具与用户对话时注意敏感词，同时兼顾活泼与善意"
 }

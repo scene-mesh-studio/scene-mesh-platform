@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class AviatorPromptService implements IPromptService {
     @Override
-    public String assembleUserMessage(Resource templateResource, Map<String, Object> variables) {
+    public String assemblePrompt(Resource templateResource, Map<String, Object> variables) {
         PromptTemplate template = PromptTemplate.builder()
                 .resource(templateResource)
                 .variables(variables)

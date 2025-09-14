@@ -14,6 +14,8 @@ public interface IProductService {
 
     Product getProduct(String productId);
 
+    List<Product> getProducts();
+
     boolean verifyProductSecret(String productId, String secretKey);
 
 }

@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface IPromptService {
 
-    String assembleUserMessage(Resource templateResource, Map<String, Object> variables);
+    String assemblePrompt(Resource templateResource, Map<String, Object> variables);
 
 }

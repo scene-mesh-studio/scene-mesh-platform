@@ -16,6 +16,7 @@ scene-mesh:
     matched-result: matched_result
     outbound-actions: outbound_actions
   # AI配置
+
   ai:
     mcp:
       server:

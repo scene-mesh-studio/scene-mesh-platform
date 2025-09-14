@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.SystemUtils.getHostName;
+
 @Slf4j
 public class RedisMessageConsumer implements IMessageConsumer {
 
@@ -94,8 +96,8 @@ public class RedisMessageConsumer implements IMessageConsumer {
         // get StreamOperations
         this.streamOperations = this.redisTemplate.opsForStream();
 
-        this.consumerGroup = "group-" + UUID.randomUUID().toString().substring(0, 8);
-        this.consumerName = "consumer-" + UUID.randomUUID().toString().substring(0, 8);
+        this.consumerGroup = "sm-group";
+        this.consumerName = "consumer-" + getHostName();
     }
 
     public void shutdown() {

@@ -55,7 +55,8 @@ audio:
 logging:
   level:
     root: INFO
-    com.scene.mesh: INFO
+    com.scene.mesh.facade: DEBUG
     org.hibernate: INFO
     org.springframework: INFO
     org.hibernate.SQL: INFO
+    i.lettuce.cor: INFO
