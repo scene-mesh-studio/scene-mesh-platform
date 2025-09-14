@@ -30,7 +30,7 @@ public class DefaultMessageExchanger implements IMessageExchanger {
 
     @Override
     public void handleInboundEvent(Event event) {
-        log.info("handle inbound event: {}", event.toString());
+        log.debug("handle inbound event: {}", event.toString());
         try {
             this.messageProducer.send(inboundEventTopic, event);
         } catch (Exception e) {

@@ -44,7 +44,7 @@ public class MessageReceiveProducer<T> extends BaseProcessor {
             List<T> objs = this.handleMessageList(list);
             for (Object obj : objs) {
                 collector.collect(obj);
-                log.info("接收到消息:{}", SimpleObjectHelper.objectData2json(obj));
+                log.debug("接收到消息:{}", SimpleObjectHelper.objectData2json(obj));
             }
         } else {
 

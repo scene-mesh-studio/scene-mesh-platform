@@ -434,7 +434,7 @@ public class CepRuleProcessorOperator<IN, OUT> extends AbstractStreamOperator<OU
      * @param timestamp The timestamp of the event
      */
     private void processEvent(CepRuleProcessor processor, NFAState nfaState, IN event, long timestamp) throws Exception {
-        log.info("=== 开始处理事件 ===");
+        log.debug("=== 开始处理事件 ===");
         log.debug("尝试获取 SharedBufferAccessor...");
         
         try (SharedBufferAccessor<IN> sharedBufferAccessor = processor.partialMatches.getAccessor()) {

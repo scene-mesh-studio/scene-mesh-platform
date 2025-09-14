@@ -12,7 +12,7 @@ public class EventProducer extends MessageReceiveProducer<Event> {
 
     @Override
     protected List<Event> handleMessageList(List<Event> list) {
-        log.info("EventProducer handleMessageList: {}", SimpleObjectHelper.objectData2json(list));
+        log.debug("EventProducer handleMessageList: {}", SimpleObjectHelper.objectData2json(list));
         return super.handleMessageList(list);
     }
 }

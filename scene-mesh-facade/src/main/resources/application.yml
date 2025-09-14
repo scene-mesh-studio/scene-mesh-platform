@@ -55,7 +55,7 @@ audio:
 logging:
   level:
     root: INFO
-    com.scene.mesh.facade: DEBUG
+    com.scene.mesh.facade: INFO
     org.hibernate: INFO
     org.springframework: INFO
     org.hibernate.SQL: INFO

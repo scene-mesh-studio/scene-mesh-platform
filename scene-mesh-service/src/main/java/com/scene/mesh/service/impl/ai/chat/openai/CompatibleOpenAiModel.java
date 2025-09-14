@@ -21,14 +21,25 @@ public class CompatibleOpenAiModel extends BaseChatModel {
 
     private final OpenAiChatModel openAiChatModel;
 
+    private int connectionTimeoutMs;
+
+    private int readTimeoutMs;
+
     public CompatibleOpenAiModel(String modelId, String modelName, String provider, String baseUrl, String path, String apiKey) {
+        this(modelId, modelName, provider, baseUrl, path, apiKey, 3000, 30000);
+    }
+
+    public CompatibleOpenAiModel(String modelId, String modelName, String provider, String baseUrl, String path, String apiKey, int connectionTimeoutMs, int readTimeoutMs) {
+        super();
         this.modelId = modelId;
         this.modelName = modelName;
         this.provider = provider;
+        this.connectionTimeoutMs = connectionTimeoutMs;
+        this.readTimeoutMs = readTimeoutMs;
 
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(3000); // 10秒连接超时
-        requestFactory.setReadTimeout(30000);    // 30秒读取超时
+        requestFactory.setConnectTimeout(connectionTimeoutMs);
+        requestFactory.setReadTimeout(readTimeoutMs);
 
         RestClient.Builder restClientBuilder = RestClient.builder()
                 .requestFactory(requestFactory);
