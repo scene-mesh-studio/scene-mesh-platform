@@ -349,11 +349,17 @@ export const models: IEntityModel[] = [
         },
       },
       {
-        name: "url",
-        title: "服务地址",
-        type: "string",
+        name: 'baseUrl',
+        title: '基础地址',
+        type: 'string',
         isRequired: true,
         schema: zod.string().url(),
+      },
+      {
+        name: 'endpoint',
+        title: '端点路径',
+        type: 'string',
+        isRequired: true
       },
       { name: "header", title: "请求头", type: "string", isRequired: false },
       {
@@ -669,7 +675,8 @@ export const views: IEntityView[] = [
     items: [
       { name: "name", title: "名称", spanCols: 12 },
       { name: "type", title: "类型", spanCols: 12, width: 150 },
-      { name: "url", title: "地址", spanCols: 12, flex: 1 },
+      { name: "baseUrl", title: "基础地址", spanCols: 12 },
+      { name: "endpoint", title: "端点路径", spanCols: 12 },
       { name: "timeout", title: "超时", spanCols: 12 },
       { name: "enable", title: "启用", spanCols: 12 },
       { name: "description", title: "说明", spanCols: 12, flex: 1 },
@@ -686,7 +693,8 @@ export const views: IEntityView[] = [
       { name: "name", title: "名称", spanCols: 12 },
       { name: "description", title: "说明", spanCols: 12, flex: 1 },
       { name: "type", title: "类型", spanCols: 12 },
-      { name: "url", title: "地址", spanCols: 12 },
+      { name: "baseUrl", title: "基础地址", spanCols: 12 },
+      { name: "endpoint", title: "端点路径", spanCols: 12 },
       {
         name: "header",
         title: "请求头",
