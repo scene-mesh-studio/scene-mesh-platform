@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Module-Id: scene-mesh-builtin
+Module-Name: Scene Mesh Builtin Module
+Module-Version: 1.0.0
+Module-Description: Built-in module for Scene Mesh Platform
+Module-Author: Scene Mesh Team

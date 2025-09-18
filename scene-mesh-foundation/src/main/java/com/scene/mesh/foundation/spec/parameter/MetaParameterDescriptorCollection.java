@@ -15,7 +15,7 @@ public class MetaParameterDescriptorCollection implements Serializable {
     private final List<MetaParameterDescriptor> parameterDescriptors;
 
     public MetaParameterDescriptorCollection() {
-        this.parameterDescriptors = new ArrayList<MetaParameterDescriptor>();
+        this.parameterDescriptors = new ArrayList<>();
     }
 
     public MetaParameterDescriptorCollection(List<MetaParameterDescriptor> ls) {

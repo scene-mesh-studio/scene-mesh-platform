@@ -57,6 +57,24 @@ export const models: IEntityModel[] = [
         isRequired: true,
       },
       {
+        name: "fieldCalculateType",
+        title: "计算类型",
+        type: "enum",
+        typeOptions: {
+          options: [
+            { value: "STT", label: "语音转文本" },
+            { value: "TTS", label: "文本转语音" },
+          ],
+        },
+        isRequired: false,
+      },
+      {
+        name: "fieldCalculateSource",
+        title: "计算来源字段",
+        type: "string",
+        isRequired: false,
+      },
+      {
         name: "fieldType",
         title: "数据类型",
         type: "enum",
@@ -896,6 +914,19 @@ export const views: IEntityView[] = [
       { name: "fieldName", title: "字段名称", spanCols: 12 },
       { name: "fieldTitle", title: "字段标题", spanCols: 12 },
       { name: "fieldCategory", title: "字段类别", spanCols: 12 },
+      { 
+        name: "fieldCalculateType", 
+        title: "计算类型", 
+        spanCols: 12,
+        widget: "select",
+        showWhen: 'fieldCategory === "compute"',
+      },
+      { 
+        name: "fieldCalculateSource", 
+        title: "计算来源字段", 
+        spanCols: 12,
+        showWhen: 'fieldCategory === "compute"',
+      },
       { name: "fieldType", title: "字段类型", spanCols: 12 },
       {
         name: "fieldAsInput",

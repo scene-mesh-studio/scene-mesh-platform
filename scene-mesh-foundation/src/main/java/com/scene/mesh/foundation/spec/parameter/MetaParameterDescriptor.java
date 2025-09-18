@@ -2,7 +2,6 @@
 package com.scene.mesh.foundation.spec.parameter;
 
 import com.scene.mesh.foundation.spec.parameter.data.IParameterDataType;
-import com.scene.mesh.foundation.spec.parameter.data.calculate.IParameterCalculator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +22,7 @@ public class MetaParameterDescriptor<T> implements Serializable {
     private IParameterDataType<T> dataType;
     @Getter
     @Setter
-    private IParameterCalculator.CalculateType calculateType;
+    private CalculatorDescriptor calculatorDescriptor;
     @Getter
     @Setter
     private boolean asInput;
@@ -43,15 +42,17 @@ public class MetaParameterDescriptor<T> implements Serializable {
         this.dataType = dataType;
     }
 
-    public MetaParameterDescriptor(String name, String title, String description, IParameterDataType dataType,IParameterCalculator.CalculateType calculateType, boolean
-            required) {
+    public MetaParameterDescriptor(String name, String title, String description,
+                                   IParameterDataType dataType,
+                                   CalculatorDescriptor calculatorDescriptor,
+                                   boolean required) {
         super();
         this.name = name;
         this.title = title;
         this.description = description;
         this.required = required;
         this.dataType = dataType;
-        this.calculateType = calculateType;
+        this.calculatorDescriptor = calculatorDescriptor;
     }
 
     public MetaParameterDescriptor setName(String name) {

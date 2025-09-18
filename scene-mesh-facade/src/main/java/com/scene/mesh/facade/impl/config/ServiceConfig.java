@@ -1,13 +1,8 @@
 package com.scene.mesh.facade.impl.config;
 
-import com.scene.mesh.foundation.impl.cache.RedisCache;
-import com.scene.mesh.foundation.spec.api.ApiClient;
 import com.scene.mesh.foundation.spec.cache.ICache;
-import com.scene.mesh.foundation.spec.parameter.data.calculate.IParameterCalculator;
-import com.scene.mesh.foundation.spec.parameter.data.calculate.IParameterCalculatorManager;
 import com.scene.mesh.model.terminal.TerminalRepository;
 import com.scene.mesh.service.impl.event.DefaultMetaEventService;
-import com.scene.mesh.service.impl.event.DefaultParameterCalculatorManager;
 import com.scene.mesh.service.impl.scene.DefaultSceneService;
 import com.scene.mesh.service.impl.speech.DefaultSpeechService;
 import com.scene.mesh.service.impl.speech.VoskSttProcessor;
@@ -80,8 +75,4 @@ public class ServiceConfig {
         return new DefaultSpeechService(audioProcessorManager,productService,terminalService);
     }
 
-    @Bean
-    public IParameterCalculatorManager parameterCalculatorManager(List<IParameterCalculator> parameterCalculatorList) {
-        return new DefaultParameterCalculatorManager(parameterCalculatorList);
-    }
 }

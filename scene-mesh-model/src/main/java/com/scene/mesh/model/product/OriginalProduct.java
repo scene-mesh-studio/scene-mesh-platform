@@ -305,6 +305,8 @@ public class OriginalProduct {
         private String fieldType;
         private String fieldTitle;
         private String fieldCategory;
+        private String fieldCalculateType;
+        private String fieldCalculateSource;
         private String fieldDescription;
         private Boolean fieldAsInput;
     }
@@ -367,6 +369,8 @@ public class OriginalProduct {
         private String fieldTitle;
         private Boolean fieldAsInput;
         private String fieldCategory;
+        private String fieldCalculateType;
+        private String fieldCalculateSource;
         private String fieldDescription;
     }
 }

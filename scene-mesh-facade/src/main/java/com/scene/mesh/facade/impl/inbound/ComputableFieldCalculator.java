@@ -1,24 +1,28 @@
 package com.scene.mesh.facade.impl.inbound;
 
+import com.scene.mesh.foundation.spec.parameter.CalculatorDescriptor;
 import com.scene.mesh.foundation.spec.parameter.MetaParameterDescriptor;
 import com.scene.mesh.foundation.spec.parameter.MetaParameterDescriptorCollection;
-import com.scene.mesh.foundation.spec.parameter.data.calculate.IParameterCalculator;
-import com.scene.mesh.foundation.spec.parameter.data.calculate.IParameterCalculatorManager;
+import com.scene.mesh.module.api.calculate.IParameterCalculator;
 import com.scene.mesh.model.event.Event;
 import com.scene.mesh.model.event.IMetaEvent;
+import com.scene.mesh.module.engine.impl.extension.SmExtensionInvoker;
+import com.scene.mesh.module.engine.impl.extension.SmSlotRegistrar;
+import com.scene.mesh.module.engine.spec.extension.ISmExtensionInvoker;
+import com.scene.mesh.module.engine.spec.extension.ISmExtensionManager;
 import com.scene.mesh.service.spec.event.IMetaEventService;
 
+import java.util.List;
 import java.util.Map;
 
 public class ComputableFieldCalculator extends BaseInboundMessageInterceptor {
 
     private final IMetaEventService metaEventService;
+    private final ISmExtensionInvoker extensionInvoker;
 
-    private final IParameterCalculatorManager parameterCalculatorManager;
-
-    public ComputableFieldCalculator(IMetaEventService metaEventService, IParameterCalculatorManager parameterCalculatorManager) {
+    public ComputableFieldCalculator(IMetaEventService metaEventService, ISmExtensionInvoker extensionInvoker) {
         this.metaEventService = metaEventService;
-        this.parameterCalculatorManager = parameterCalculatorManager;
+        this.extensionInvoker = extensionInvoker;
     }
 
     @Override
@@ -30,18 +34,22 @@ public class ComputableFieldCalculator extends BaseInboundMessageInterceptor {
 
         MetaParameterDescriptorCollection collection = metaEvent.getParameterCollection();
         for (MetaParameterDescriptor parameterDescriptor : collection.getParameterDescriptors()) {
-            IParameterCalculator.CalculateType calculateType = parameterDescriptor.getCalculateType();
-            if (calculateType == null) continue;
+            CalculatorDescriptor calculatorDescriptor = parameterDescriptor.getCalculatorDescriptor();
+            if (calculatorDescriptor == null) continue;
 
-            IParameterCalculator calculator = this.parameterCalculatorManager.getParameterCalculator(calculateType);
-            if (calculator == null) {
-                throw new RuntimeException("Can not find calculator for " + calculateType);
-            }
+            // 将CalculateType枚举转换为String类型
+            String calculatorType = calculatorDescriptor.getCalculatorType();
+            String sourceField = calculatorDescriptor.getSourceField();
 
-            calculator.calculate(event.getTerminalId(), event.getPayload(), parameterDescriptor);
-
+            // 直接调用扩展插件的calculate方法
+            extensionInvoker.invokeExtension(
+                    SmSlotRegistrar.CALCULATE_SLOT_ID,
+                    calculatorType,
+                    "calculate",
+                    sourceField,
+                    event.getPayload()
+            );
         }
-
         event.setPayload(payload);
     }
 

@@ -82,9 +82,9 @@ public class SceneMeshEnginApplication {
         }
     }
 
-    private inBoundEventCom(){
-
-    }
+//    private inBoundEventCom(){
+//
+//    }TODO
 
     private static ProcessorGraph whenGraph() {
 
@@ -137,9 +137,9 @@ public class SceneMeshEnginApplication {
                 .build();
     }
 
-    private outBoundActionCom(){
-
-    }
+//    private outBoundActionCom(){
+//
+//    }TODO
 
     private static ProcessorGraph cacheScheduler(){
         return ProcessorGraphBuilder.createWithId("scheduler")

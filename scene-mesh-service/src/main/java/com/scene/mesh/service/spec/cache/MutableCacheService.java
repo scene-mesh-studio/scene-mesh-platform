@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.scene.mesh.foundation.impl.helper.SimpleObjectHelper;
 import com.scene.mesh.foundation.spec.api.ApiClient;
 import com.scene.mesh.foundation.spec.cache.ICache;
+import com.scene.mesh.foundation.spec.parameter.CalculatorDescriptor;
 import com.scene.mesh.foundation.spec.parameter.MetaParameterDescriptor;
 import com.scene.mesh.foundation.spec.parameter.data.*;
-import com.scene.mesh.foundation.spec.parameter.data.calculate.IParameterCalculator;
 import com.scene.mesh.model.action.DefaultMetaAction;
 import com.scene.mesh.model.action.IMetaAction;
 import com.scene.mesh.model.event.DefaultMetaEvent;
@@ -43,7 +43,6 @@ import com.scene.mesh.service.impl.cache.scene.SceneCacheProvider;
 import com.scene.mesh.service.impl.cache.terminal.TerminalSessionCache;
 import com.scene.mesh.service.impl.cache.terminal.TerminalSessionCacheProvider;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -368,13 +367,17 @@ public class MutableCacheService {
                         String fDes = f.getValues().getFieldDescription();
                         String fType = f.getValues().getFieldType();
                         String fCategory = f.getValues().getFieldCategory();
+                        String fCalculateType = f.getValues().getFieldCalculateType();
+                        String fCalculateSource = f.getValues().getFieldCalculateSource();
                         IParameterDataType dataType = confirmDataType(fType);
                         if (dataType == null) {
                             throw new RuntimeException("cannot find dataType pass field type:" + fType);
                         }
                         MetaParameterDescriptor metaParameterDescriptor = new MetaParameterDescriptor(
                                 fName, fTitle, fDes, dataType, false);
-                        metaParameterDescriptor.setCalculateType("compute".equals(fCategory) ? IParameterCalculator.CalculateType.STT : null);
+                        if ("compute".equals(fCategory)) {
+                            metaParameterDescriptor.setCalculatorDescriptor(new CalculatorDescriptor(fCalculateType, fCalculateSource));
+                        }
 
                         metaAction.addParameterDescriptor(metaParameterDescriptor);
                     });
@@ -453,13 +456,17 @@ public class MutableCacheService {
                     String fType = f.getValues().getFieldType();
                     Boolean fAsInput = f.getValues().getFieldAsInput();
                     String fCategory = f.getValues().getFieldCategory();
+                    String fCalculateType = f.getValues().getFieldCalculateType();
+                    String fCalculateSource = f.getValues().getFieldCalculateSource();
                     IParameterDataType dataType = confirmDataType(fType);
                     if (dataType == null) {
                         throw new RuntimeException("cannot find dataType pass field type:" + fType);
                     }
                     MetaParameterDescriptor metaParameterDescriptor = new MetaParameterDescriptor(
                             fName, fTitle, fDes, dataType, false);
-                    metaParameterDescriptor.setCalculateType("compute".equals(fCategory) ? IParameterCalculator.CalculateType.STT : null);
+                    if ("compute".equals(fCategory)){
+                        metaParameterDescriptor.setCalculatorDescriptor(new CalculatorDescriptor(fCalculateType,fCalculateSource));
+                    }
                     metaParameterDescriptor.setAsInput(fAsInput);
 
                     metaEvent.addParameterDescriptor(metaParameterDescriptor);
