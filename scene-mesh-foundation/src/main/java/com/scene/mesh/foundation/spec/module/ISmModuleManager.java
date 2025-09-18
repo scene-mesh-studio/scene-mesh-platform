@@ -6,20 +6,16 @@ public interface ISmModuleManager {
      * 加载 module
      * @param modulePath module 路径，当前支持 URL
      */
-    ISmModule loadModule(String modulePath);
+    ISmModule loadModule(String moduleId, String modulePath) throws ISmModuleLoader.ModuleLoadException;
 
-    /**
-     * 注册 module
-     */
-    boolean registerModule(ISmModule module);
-
-    /**
-     * 注销 module
-     */
-    void unregisterModule(String moduleId);
+    void unloadModule(String moduleId) throws ISmModuleLoader.ModuleLoadException;
 
     /**
      * 获取 module
      */
     ISmModule getModule(String moduleId);
+
+    boolean isModuleLoaded(String moduleId);
+
+    void reloadModule(String moduleId) throws ISmModuleLoader.ModuleLoadException;
 }

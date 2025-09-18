@@ -2,6 +2,7 @@ package com.scene.mesh.foundation.spec.module;
 
 import java.util.List;
 import java.util.Map;
+import com.scene.mesh.foundation.spec.module.extension.ISmExtensionPlugin;
 
 /**
  * Module 定义
@@ -30,10 +31,10 @@ public interface ISmModule {
     String getPath();
 
     /**
-     * 模块中的扩展能力列表
-     * @return 扩展插件 ID 列表
+     * 模块中的扩展插件列表
+     * @return 扩展插件实例列表
      */
-    List<String> getExtensionCapacities();
+    List<ISmExtensionPlugin> getExtensionCapacities();
 
     /**
      * 元数据
